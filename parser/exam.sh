@@ -1,0 +1,1 @@
+CTEST_OUTPUT_ON_FAILURE=1 cmake --build $HOME/sysu/build -t test

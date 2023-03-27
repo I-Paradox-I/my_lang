@@ -1,5 +1,5 @@
 {
-  "id": "0x17ac598",
+  "id": "0x131c598",
   "kind": "TranslationUnitDecl",
   "loc": {},
   "range": {
@@ -8,7 +8,7 @@
   },
   "inner": [
     {
-      "id": "0x17ace58",
+      "id": "0x131ce58",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -22,7 +22,7 @@
       },
       "inner": [
         {
-          "id": "0x17acb30",
+          "id": "0x131cb30",
           "kind": "BuiltinType",
           "type": {
             "qualType": "__int128"
@@ -31,7 +31,7 @@
       ]
     },
     {
-      "id": "0x17acec8",
+      "id": "0x131cec8",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -45,7 +45,7 @@
       },
       "inner": [
         {
-          "id": "0x17acb50",
+          "id": "0x131cb50",
           "kind": "BuiltinType",
           "type": {
             "qualType": "unsigned __int128"
@@ -54,7 +54,7 @@
       ]
     },
     {
-      "id": "0x17ad1d0",
+      "id": "0x131d1d0",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -68,13 +68,13 @@
       },
       "inner": [
         {
-          "id": "0x17acfa0",
+          "id": "0x131cfa0",
           "kind": "RecordType",
           "type": {
             "qualType": "struct __NSConstantString_tag"
           },
           "decl": {
-            "id": "0x17acf20",
+            "id": "0x131cf20",
             "kind": "RecordDecl",
             "name": "__NSConstantString_tag"
           }
@@ -82,7 +82,7 @@
       ]
     },
     {
-      "id": "0x17ad278",
+      "id": "0x131d278",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -96,14 +96,14 @@
       },
       "inner": [
         {
-          "id": "0x17ad230",
+          "id": "0x131d230",
           "kind": "PointerType",
           "type": {
             "qualType": "char *"
           },
           "inner": [
             {
-              "id": "0x17ac630",
+              "id": "0x131c630",
               "kind": "BuiltinType",
               "type": {
                 "qualType": "char"
@@ -114,7 +114,7 @@
       ]
     },
     {
-      "id": "0x17ebcc0",
+      "id": "0x135bcc0",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -128,7 +128,7 @@
       },
       "inner": [
         {
-          "id": "0x17ad510",
+          "id": "0x131d510",
           "kind": "ConstantArrayType",
           "type": {
             "qualType": "struct __va_list_tag [1]"
@@ -136,13 +136,13 @@
           "size": 1,
           "inner": [
             {
-              "id": "0x17ad350",
+              "id": "0x131d350",
               "kind": "RecordType",
               "type": {
                 "qualType": "struct __va_list_tag"
               },
               "decl": {
-                "id": "0x17ad2d0",
+                "id": "0x131d2d0",
                 "kind": "RecordDecl",
                 "name": "__va_list_tag"
               }
@@ -152,7 +152,7 @@
       ]
     },
     {
-      "id": "0x17ebd78",
+      "id": "0x135bd78",
       "kind": "FunctionDecl",
       "loc": {
         "offset": 229,
@@ -184,7 +184,7 @@
       },
       "inner": [
         {
-          "id": "0x17ebe90",
+          "id": "0x135be90",
           "kind": "CompoundStmt",
           "range": {
             "begin": {
@@ -204,7 +204,7 @@
           },
           "inner": [
             {
-              "id": "0x17ebe80",
+              "id": "0x135be80",
               "kind": "ReturnStmt",
               "range": {
                 "begin": {
@@ -222,7 +222,7 @@
               },
               "inner": [
                 {
-                  "id": "0x17ebe60",
+                  "id": "0x135be60",
                   "kind": "IntegerLiteral",
                   "range": {
                     "begin": {
