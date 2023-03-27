@@ -1,0 +1,9 @@
+int 'int'	[StartOfLine] Loc=<<stdin>:1:1>
+identifier 'a'	[LeadingSpace] Loc=<<stdin>:1:5>
+equal '='	[LeadingSpace] Loc=<<stdin>:1:7>
+numeric_constant '3'	[LeadingSpace] Loc=<<stdin>:1:9>
+semi ';'	Loc=<<stdin>:1:10>
+return 'return'	[StartOfLine] [LeadingSpace] Loc=<<stdin>:2:5>
+identifier 'test'	[StartOfLine] Loc=<<stdin>:3:1>
+identifier 'pass'	[LeadingSpace] Loc=<<stdin>:3:6>
+eof ''		Loc=<<stdin>:2:11>

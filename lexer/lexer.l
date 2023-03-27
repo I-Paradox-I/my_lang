@@ -9,7 +9,7 @@ int main() {
   } while (yylex() != YYEOF);
 }
 std::string yyloc = "<stdin>";
-int yyrow = 1, yycolumn = 1, yycolpre = 1;
+int yyrow = 1, yycolumn = 1, yycolpre = 1, yynewline = 1, yyspace = 0;
 #define YY_USER_ACTION                                                         \
   do {                                                                         \
     yycolumn += yyleng;                                                        \
@@ -33,51 +33,470 @@ int yyrow = 1, yycolumn = 1, yycolpre = 1;
   ++yyrow;
   yycolpre = yycolumn;
   yycolumn = 1;
+  yynewline = 1;
 }
-[\f\r\t\v ] {}
-int {
-  std::fprintf(yyout, "int '%s'\t\tLoc=<%s:%d:%d>\n", yytext, yyloc.c_str(),
+[ ]+ {
+  yyspace = 1;
+}
+[\f\r\t\v] {}
+void {
+  std::string s = "";
+  if(yynewline) s.append("[StartOfLine] ");
+  if(yyspace) s.append("[LeadingSpace] ");
+  std::fprintf(yyout, "void '%s'\t%sLoc=<%s:%d:%d>\n", yytext, s.c_str(), yyloc.c_str(),
                yyrow, yycolumn - yyleng);
+  yynewline = 0;
+  yyspace = 0;
+  return ~YYEOF;
+}
+const {
+  std::string s = "";
+  if(yynewline) s.append("[StartOfLine] ");
+  if(yyspace) s.append("[LeadingSpace] ");
+  std::fprintf(yyout, "const '%s'\t%sLoc=<%s:%d:%d>\n", yytext, s.c_str(), yyloc.c_str(),
+               yyrow, yycolumn - yyleng);
+  yynewline = 0;
+  yyspace = 0;
+  return ~YYEOF;
+}
+char {
+  std::string s = "";
+  if(yynewline) s.append("[StartOfLine] ");
+  if(yyspace) s.append("[LeadingSpace] ");
+  std::fprintf(yyout, "char '%s'\t%sLoc=<%s:%d:%d>\n", yytext, s.c_str(), yyloc.c_str(),
+               yyrow, yycolumn - yyleng);
+  yynewline = 0;
+  yyspace = 0;
+  return ~YYEOF;
+}
+long {
+  std::string s = "";
+  if(yynewline) s.append("[StartOfLine] ");
+  if(yyspace) s.append("[LeadingSpace] ");
+  std::fprintf(yyout, "long '%s'\t%sLoc=<%s:%d:%d>\n", yytext, s.c_str(), yyloc.c_str(),
+               yyrow, yycolumn - yyleng);
+  yynewline = 0;
+  yyspace = 0;
+  return ~YYEOF;
+}
+int {
+  std::string s = "";
+  if(yynewline) s.append("[StartOfLine] ");
+  if(yyspace) s.append("[LeadingSpace] ");
+  std::fprintf(yyout, "int '%s'\t%sLoc=<%s:%d:%d>\n", yytext, s.c_str(), yyloc.c_str(),
+               yyrow, yycolumn - yyleng);
+  yynewline = 0;
+  yyspace = 0;
+  return ~YYEOF;
+}
+float {
+  std::string s = "";
+  if(yynewline) s.append("[StartOfLine] ");
+  if(yyspace) s.append("[LeadingSpace] ");
+  std::fprintf(yyout, "float '%s'\t%sLoc=<%s:%d:%d>\n", yytext, s.c_str(), yyloc.c_str(),
+               yyrow, yycolumn - yyleng);
+  yynewline = 0;
+  yyspace = 0;
+  return ~YYEOF;
+}
+double {
+  std::string s = "";
+  if(yynewline) s.append("[StartOfLine] ");
+  if(yyspace) s.append("[LeadingSpace] ");
+  std::fprintf(yyout, "double '%s'\t%sLoc=<%s:%d:%d>\n", yytext, s.c_str(), yyloc.c_str(),
+               yyrow, yycolumn - yyleng);
+  yynewline = 0;
+  yyspace = 0;
+  return ~YYEOF;
+}
+if {
+  std::string s = "";
+  if(yynewline) s.append("[StartOfLine] ");
+  if(yyspace) s.append("[LeadingSpace] ");
+  std::fprintf(yyout, "if '%s'\t%sLoc=<%s:%d:%d>\n", yytext, s.c_str(), yyloc.c_str(),
+               yyrow, yycolumn - yyleng);
+  yynewline = 0;
+  yyspace = 0;
+  return ~YYEOF;
+}
+else {
+  std::string s = "";
+  if(yynewline) s.append("[StartOfLine] ");
+  if(yyspace) s.append("[LeadingSpace] ");
+  std::fprintf(yyout, "else '%s'\t%sLoc=<%s:%d:%d>\n", yytext, s.c_str(), yyloc.c_str(),
+               yyrow, yycolumn - yyleng);
+  yynewline = 0;
+  yyspace = 0;
+  return ~YYEOF;
+}
+do {
+  std::string s = "";
+  if(yynewline) s.append("[StartOfLine] ");
+  if(yyspace) s.append("[LeadingSpace] ");
+  std::fprintf(yyout, "do '%s'\t%sLoc=<%s:%d:%d>\n", yytext, s.c_str(), yyloc.c_str(),
+               yyrow, yycolumn - yyleng);
+  yynewline = 0;
+  yyspace = 0;
+  return ~YYEOF;
+}
+while {
+  std::string s = "";
+  if(yynewline) s.append("[StartOfLine] ");
+  if(yyspace) s.append("[LeadingSpace] ");
+  std::fprintf(yyout, "while '%s'\t%sLoc=<%s:%d:%d>\n", yytext, s.c_str(), yyloc.c_str(),
+               yyrow, yycolumn - yyleng);
+  yynewline = 0;
+  yyspace = 0;
+  return ~YYEOF;
+}
+break {
+  std::string s = "";
+  if(yynewline) s.append("[StartOfLine] ");
+  if(yyspace) s.append("[LeadingSpace] ");
+  std::fprintf(yyout, "break '%s'\t%sLoc=<%s:%d:%d>\n", yytext, s.c_str(), yyloc.c_str(),
+               yyrow, yycolumn - yyleng);
+  yynewline = 0;
+  yyspace = 0;
+  return ~YYEOF;
+}
+continue {
+  std::string s = "";
+  if(yynewline) s.append("[StartOfLine] ");
+  if(yyspace) s.append("[LeadingSpace] ");
+  std::fprintf(yyout, "continue '%s'\t%sLoc=<%s:%d:%d>\n", yytext, s.c_str(), yyloc.c_str(),
+               yyrow, yycolumn - yyleng);
+  yynewline = 0;
+  yyspace = 0;
   return ~YYEOF;
 }
 return {
-  std::fprintf(yyout, "return '%s'\t\tLoc=<%s:%d:%d>\n", yytext, yyloc.c_str(),
+  std::string s = "";
+  if(yynewline) s.append("[StartOfLine] ");
+  if(yyspace) s.append("[LeadingSpace] ");
+  std::fprintf(yyout, "return '%s'\t%sLoc=<%s:%d:%d>\n", yytext, s.c_str(), yyloc.c_str(),
                yyrow, yycolumn - yyleng);
+  yynewline = 0;
+  yyspace = 0;
   return ~YYEOF;
 }
 \( {
-  std::fprintf(yyout, "l_paren '%s'\t\tLoc=<%s:%d:%d>\n", yytext, yyloc.c_str(),
+  std::string s = "";
+  if(yynewline) s.append("[StartOfLine] ");
+  if(yyspace) s.append("[LeadingSpace] ");
+  std::fprintf(yyout, "l_paren '%s'\t%sLoc=<%s:%d:%d>\n", yytext, s.c_str(), yyloc.c_str(),
                yyrow, yycolumn - yyleng);
+  yynewline = 0;
+  yyspace = 0;
   return ~YYEOF;
 }
 \) {
-  std::fprintf(yyout, "r_paren '%s'\t\tLoc=<%s:%d:%d>\n", yytext, yyloc.c_str(),
+  std::string s = "";
+  if(yynewline) s.append("[StartOfLine] ");
+  if(yyspace) s.append("[LeadingSpace] ");
+  std::fprintf(yyout, "r_paren '%s'\t%sLoc=<%s:%d:%d>\n", yytext, s.c_str(), yyloc.c_str(),
                yyrow, yycolumn - yyleng);
+  yynewline = 0;
+  yyspace = 0;
   return ~YYEOF;
 }
 \{ {
-  std::fprintf(yyout, "l_brace '%s'\t\tLoc=<%s:%d:%d>\n", yytext, yyloc.c_str(),
+  std::string s = "";
+  if(yynewline) s.append("[StartOfLine] ");
+  if(yyspace) s.append("[LeadingSpace] ");
+  std::fprintf(yyout, "l_brace '%s'\t%sLoc=<%s:%d:%d>\n", yytext, s.c_str(), yyloc.c_str(),
                yyrow, yycolumn - yyleng);
+  yynewline = 0;
+  yyspace = 0;
   return ~YYEOF;
 }
 \} {
-  std::fprintf(yyout, "r_brace '%s'\t\tLoc=<%s:%d:%d>\n", yytext, yyloc.c_str(),
+  std::string s = "";
+  if(yynewline) s.append("[StartOfLine] ");
+  if(yyspace) s.append("[LeadingSpace] ");
+  std::fprintf(yyout, "r_brace '%s'\t%sLoc=<%s:%d:%d>\n", yytext, s.c_str(), yyloc.c_str(),
                yyrow, yycolumn - yyleng);
+  yynewline = 0;
+  yyspace = 0;
+  return ~YYEOF;
+}
+\[ {
+  std::string s = "";
+  if(yynewline) s.append("[StartOfLine] ");
+  if(yyspace) s.append("[LeadingSpace] ");
+  std::fprintf(yyout, "l_square '%s'\t%sLoc=<%s:%d:%d>\n", yytext, s.c_str(), yyloc.c_str(),
+               yyrow, yycolumn - yyleng);
+  yynewline = 0;
+  yyspace = 0;
+  return ~YYEOF;
+}
+\] {
+  std::string s = "";
+  if(yynewline) s.append("[StartOfLine] ");
+  if(yyspace) s.append("[LeadingSpace] ");
+  std::fprintf(yyout, "r_square '%s'\t%sLoc=<%s:%d:%d>\n", yytext, s.c_str(), yyloc.c_str(),
+               yyrow, yycolumn - yyleng);
+  yynewline = 0;
+  yyspace = 0;
+  return ~YYEOF;
+}
+, {
+  std::string s = "";
+  if(yynewline) s.append("[StartOfLine] ");
+  if(yyspace) s.append("[LeadingSpace] ");
+  std::fprintf(yyout, "comma '%s'\t%sLoc=<%s:%d:%d>\n", yytext, s.c_str(), yyloc.c_str(),
+               yyrow, yycolumn - yyleng);
+  yynewline = 0;
+  yyspace = 0;
   return ~YYEOF;
 }
 ; {
-  std::fprintf(yyout, "semi '%s'\t\tLoc=<%s:%d:%d>\n", yytext, yyloc.c_str(),
+  std::string s = "";
+  if(yynewline) s.append("[StartOfLine] ");
+  if(yyspace) s.append("[LeadingSpace] ");
+  std::fprintf(yyout, "semi '%s'\t%sLoc=<%s:%d:%d>\n", yytext, s.c_str(), yyloc.c_str(),
                yyrow, yycolumn - yyleng);
+  yynewline = 0;
+  yyspace = 0;
+  return ~YYEOF;
+}
+= {
+  std::string s = "";
+  if(yynewline) s.append("[StartOfLine] ");
+  if(yyspace) s.append("[LeadingSpace] ");
+  std::fprintf(yyout, "equal '%s'\t%sLoc=<%s:%d:%d>\n", yytext, s.c_str(), yyloc.c_str(),
+               yyrow, yycolumn - yyleng);
+  yynewline = 0;
+  yyspace = 0;
+  return ~YYEOF;
+}
+! {
+  std::string s = "";
+  if(yynewline) s.append("[StartOfLine] ");
+  if(yyspace) s.append("[LeadingSpace] ");
+  std::fprintf(yyout, "exclaim '%s'\t%sLoc=<%s:%d:%d>\n", yytext, s.c_str(), yyloc.c_str(),
+               yyrow, yycolumn - yyleng);
+  yynewline = 0;
+  yyspace = 0;
+  return ~YYEOF;
+}
+"+" {
+  std::string s = "";
+  if(yynewline) s.append("[StartOfLine] ");
+  if(yyspace) s.append("[LeadingSpace] ");
+  std::fprintf(yyout, "plus '%s'\t%sLoc=<%s:%d:%d>\n", yytext, s.c_str(), yyloc.c_str(),
+               yyrow, yycolumn - yyleng);
+  yynewline = 0;
+  yyspace = 0;
+  return ~YYEOF;
+}
+- {
+  std::string s = "";
+  if(yynewline) s.append("[StartOfLine] ");
+  if(yyspace) s.append("[LeadingSpace] ");
+  std::fprintf(yyout, "minus '%s'\t%sLoc=<%s:%d:%d>\n", yytext, s.c_str(), yyloc.c_str(),
+               yyrow, yycolumn - yyleng);
+  yynewline = 0;
+  yyspace = 0;
+  return ~YYEOF;
+}
+"*" {
+  std::string s = "";
+  if(yynewline) s.append("[StartOfLine] ");
+  if(yyspace) s.append("[LeadingSpace] ");
+  std::fprintf(yyout, "star '%s'\t%sLoc=<%s:%d:%d>\n", yytext, s.c_str(), yyloc.c_str(),
+               yyrow, yycolumn - yyleng);
+  yynewline = 0;
+  yyspace = 0;
+  return ~YYEOF;
+}
+"/" {
+  std::string s = "";
+  if(yynewline) s.append("[StartOfLine] ");
+  if(yyspace) s.append("[LeadingSpace] ");
+  std::fprintf(yyout, "slash '%s'\t%sLoc=<%s:%d:%d>\n", yytext, s.c_str(), yyloc.c_str(),
+               yyrow, yycolumn - yyleng);
+  yynewline = 0;
+  yyspace = 0;
+  return ~YYEOF;
+}
+% {
+  std::string s = "";
+  if(yynewline) s.append("[StartOfLine] ");
+  if(yyspace) s.append("[LeadingSpace] ");
+  std::fprintf(yyout, "percent '%s'\t%sLoc=<%s:%d:%d>\n", yytext, s.c_str(), yyloc.c_str(),
+               yyrow, yycolumn - yyleng);
+  yynewline = 0;
+  yyspace = 0;
+  return ~YYEOF;
+}
+"<" {
+  std::string s = "";
+  if(yynewline) s.append("[StartOfLine] ");
+  if(yyspace) s.append("[LeadingSpace] ");
+  std::fprintf(yyout, "less '%s'\t%sLoc=<%s:%d:%d>\n", yytext, s.c_str(), yyloc.c_str(),
+               yyrow, yycolumn - yyleng);
+  yynewline = 0;
+  yyspace = 0;
+  return ~YYEOF;
+}
+">" {
+  std::string s = "";
+  if(yynewline) s.append("[StartOfLine] ");
+  if(yyspace) s.append("[LeadingSpace] ");
+  std::fprintf(yyout, "greater '%s'\t%sLoc=<%s:%d:%d>\n", yytext, s.c_str(), yyloc.c_str(),
+               yyrow, yycolumn - yyleng);
+  yynewline = 0;
+  yyspace = 0;
+  return ~YYEOF;
+}
+"<=" {
+  std::string s = "";
+  if(yynewline) s.append("[StartOfLine] ");
+  if(yyspace) s.append("[LeadingSpace] ");
+  std::fprintf(yyout, "lessequal '%s'\t%sLoc=<%s:%d:%d>\n", yytext, s.c_str(), yyloc.c_str(),
+               yyrow, yycolumn - yyleng);
+  yynewline = 0;
+  yyspace = 0;
+  return ~YYEOF;
+}
+">=" {
+  std::string s = "";
+  if(yynewline) s.append("[StartOfLine] ");
+  if(yyspace) s.append("[LeadingSpace] ");
+  std::fprintf(yyout, "greaterequal '%s'\t%sLoc=<%s:%d:%d>\n", yytext, s.c_str(), yyloc.c_str(),
+               yyrow, yycolumn - yyleng);
+  yynewline = 0;
+  yyspace = 0;
+  return ~YYEOF;
+}
+== {
+  std::string s = "";
+  if(yynewline) s.append("[StartOfLine] ");
+  if(yyspace) s.append("[LeadingSpace] ");
+  std::fprintf(yyout, "equalequal '%s'\t%sLoc=<%s:%d:%d>\n", yytext, s.c_str(), yyloc.c_str(),
+               yyrow, yycolumn - yyleng);
+  yynewline = 0;
+  yyspace = 0;
+  return ~YYEOF;
+}
+!= {
+  std::string s = "";
+  if(yynewline) s.append("[StartOfLine] ");
+  if(yyspace) s.append("[LeadingSpace] ");
+  std::fprintf(yyout, "exclaimequal '%s'\t%sLoc=<%s:%d:%d>\n", yytext, s.c_str(), yyloc.c_str(),
+               yyrow, yycolumn - yyleng);
+  yynewline = 0;
+  yyspace = 0;
+  return ~YYEOF;
+}
+"&&" {
+  std::string s = "";
+  if(yynewline) s.append("[StartOfLine] ");
+  if(yyspace) s.append("[LeadingSpace] ");
+  std::fprintf(yyout, "ampamp '%s'\t%sLoc=<%s:%d:%d>\n", yytext, s.c_str(), yyloc.c_str(),
+               yyrow, yycolumn - yyleng);
+  yynewline = 0;
+  yyspace = 0;
+  return ~YYEOF;
+}
+"||" {
+  std::string s = "";
+  if(yynewline) s.append("[StartOfLine] ");
+  if(yyspace) s.append("[LeadingSpace] ");
+  std::fprintf(yyout, "pipepipe '%s'\t%sLoc=<%s:%d:%d>\n", yytext, s.c_str(), yyloc.c_str(),
+               yyrow, yycolumn - yyleng);
+  yynewline = 0;
+  yyspace = 0;
+  return ~YYEOF;
+}
+"..." {
+  std::string s = "";
+  if(yynewline) s.append("[StartOfLine] ");
+  if(yyspace) s.append("[LeadingSpace] ");
+  std::fprintf(yyout, "ellipsis '%s'\t%sLoc=<%s:%d:%d>\n", yytext, s.c_str(), yyloc.c_str(),
+               yyrow, yycolumn - yyleng);
+  yynewline = 0;
+  yyspace = 0;
   return ~YYEOF;
 }
 [0-9]+ {
-  std::fprintf(yyout, "numeric_constant '%s'\t\tLoc=<%s:%d:%d>\n", yytext,
-               yyloc.c_str(), yyrow, yycolumn - yyleng);
+  std::string s = "";
+  if(yynewline) s.append("[StartOfLine] ");
+  if(yyspace) s.append("[LeadingSpace] ");
+  std::fprintf(yyout, "numeric_constant '%s'\t%sLoc=<%s:%d:%d>\n", yytext,
+               s.c_str(), yyloc.c_str(), yyrow, yycolumn - yyleng);
+  yynewline = 0;
+  yyspace = 0;
+  return ~YYEOF;
+}
+0[bB][01]+ {
+  std::string s = "";
+  if(yynewline) s.append("[StartOfLine] ");
+  if(yyspace) s.append("[LeadingSpace] ");
+  std::fprintf(yyout, "numeric_constant '%s'\t%sLoc=<%s:%d:%d>\n", yytext,
+               s.c_str(), yyloc.c_str(), yyrow, yycolumn - yyleng);
+  yynewline = 0;
+  yyspace = 0;
+  return ~YYEOF;
+}
+0[xX][0-9a-fA-F]+ {
+  std::string s = "";
+  if(yynewline) s.append("[StartOfLine] ");
+  if(yyspace) s.append("[LeadingSpace] ");
+  std::fprintf(yyout, "numeric_constant '%s'\t%sLoc=<%s:%d:%d>\n", yytext,
+               s.c_str(), yyloc.c_str(), yyrow, yycolumn - yyleng);
+  yynewline = 0;
+  yyspace = 0;
+  return ~YYEOF;
+}
+([0-9]*\.[0-9]+|[0-9]+(\.[0-9]*)?)([eE][-+]?[0-9]+)? {
+  std::string s = "";
+  if(yynewline) s.append("[StartOfLine] ");
+  if(yyspace) s.append("[LeadingSpace] ");
+  std::fprintf(yyout, "numeric_constant '%s'\t%sLoc=<%s:%d:%d>\n", yytext,
+               s.c_str(), yyloc.c_str(), yyrow, yycolumn - yyleng);
+  yynewline = 0;
+  yyspace = 0;
+  return ~YYEOF;
+}
+0[xX]([0-9a-fA-F]*\.[0-9a-fA-F]+|[0-9a-fA-F]+(\.[0-9a-fA-F]*)?)([pP][-+]?[0-9]+)? {
+  std::string s = "";
+  if(yynewline) s.append("[StartOfLine] ");
+  if(yyspace) s.append("[LeadingSpace] ");
+  std::fprintf(yyout, "numeric_constant '%s'\t%sLoc=<%s:%d:%d>\n", yytext,
+               s.c_str(), yyloc.c_str(), yyrow, yycolumn - yyleng);
+  yynewline = 0;
+  yyspace = 0;
   return ~YYEOF;
 }
 [a-zA-Z_][a-zA-Z_0-9]* {
-  std::fprintf(yyout, "identifier '%s'\t\tLoc=<%s:%d:%d>\n", yytext,
-               yyloc.c_str(), yyrow, yycolumn - yyleng);
+  std::string s = "";
+  if(yynewline) s.append("[StartOfLine] ");
+  if(yyspace) s.append("[LeadingSpace] ");
+  std::fprintf(yyout, "identifier '%s'\t%sLoc=<%s:%d:%d>\n", yytext,
+               s.c_str(), yyloc.c_str(), yyrow, yycolumn - yyleng);
+  yynewline = 0;
+  yyspace = 0;
+  return ~YYEOF;
+}
+\"[^"\\]*((\\[onrtvabf'"\\?])*[^"\\]*)*\" {
+  std::string s = "";
+  if(yynewline) s.append("[StartOfLine] ");
+  if(yyspace) s.append("[LeadingSpace] ");
+  std::fprintf(yyout, "string_literal '%s'\t%sLoc=<%s:%d:%d>\n", yytext,
+               s.c_str(), yyloc.c_str(), yyrow, yycolumn - yyleng);
+  yynewline = 0;
+  yyspace = 0;
+  return ~YYEOF;
+}
+\'[^"\\]|(\\[onrtvabf'"\\?])\' {
+  std::string s = "";
+  if(yynewline) s.append("[StartOfLine] ");
+  if(yyspace) s.append("[LeadingSpace] ");
+  std::fprintf(yyout, "char '%s'\t%sLoc=<%s:%d:%d>\n", yytext,
+               s.c_str(), yyloc.c_str(), yyrow, yycolumn - yyleng);
+  yynewline = 0;
+  yyspace = 0;
   return ~YYEOF;
 }
 <<EOF>> {
@@ -86,8 +505,13 @@ return {
   return YYEOF;
 }
 . {
-  std::fprintf(yyout, "unknown '%s'\t\tLoc=<%s:%d:%d>\n", yytext, yyloc.c_str(),
+  std::string s = "";
+  if(yynewline) s.append("[StartOfLine] ");
+  if(yyspace) s.append("[LeadingSpace] ");
+  std::fprintf(yyout, "unknown '%s'\t%sLoc=<%s:%d:%d>\n", yytext, s.c_str(), yyloc.c_str(),
                yyrow, yycolumn - yyleng);
+  yynewline = 0;
+  yyspace = 0;
   return ~YYEOF;
 }
 %%

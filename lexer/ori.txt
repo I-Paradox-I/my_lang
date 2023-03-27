@@ -1,0 +1,158 @@
+numeric_constant '1'	 [StartOfLine]	Loc=</workspace/SYsU-lang/lexer/test.sysu.c:1:1>
+comma ','	 [StartOfLine]	Loc=</workspace/SYsU-lang/lexer/test.sysu.c:2:1>
+semi ';'	 [StartOfLine]	Loc=</workspace/SYsU-lang/lexer/test.sysu.c:3:1>
+int 'int'	 [StartOfLine]	Loc=</workspace/SYsU-lang/lexer/test.sysu.c:4:1>
+l_square '['	 [StartOfLine]	Loc=</workspace/SYsU-lang/lexer/test.sysu.c:5:1>
+r_square ']'	 [StartOfLine]	Loc=</workspace/SYsU-lang/lexer/test.sysu.c:6:1>
+equal '='	 [StartOfLine]	Loc=</workspace/SYsU-lang/lexer/test.sysu.c:7:1>
+l_brace '{'	 [StartOfLine]	Loc=</workspace/SYsU-lang/lexer/test.sysu.c:8:1>
+r_brace '}'	 [StartOfLine]	Loc=</workspace/SYsU-lang/lexer/test.sysu.c:9:1>
+identifier 'ident'	 [StartOfLine]	Loc=</workspace/SYsU-lang/lexer/test.sysu.c:10:1>
+l_paren '('	 [StartOfLine]	Loc=</workspace/SYsU-lang/lexer/test.sysu.c:11:1>
+r_paren ')'	 [StartOfLine]	Loc=</workspace/SYsU-lang/lexer/test.sysu.c:12:1>
+void 'void'	 [StartOfLine]	Loc=</workspace/SYsU-lang/lexer/test.sysu.c:13:1>
+if 'if'	 [StartOfLine]	Loc=</workspace/SYsU-lang/lexer/test.sysu.c:14:1>
+else 'else'	 [StartOfLine]	Loc=</workspace/SYsU-lang/lexer/test.sysu.c:15:1>
+while 'while'	 [StartOfLine]	Loc=</workspace/SYsU-lang/lexer/test.sysu.c:16:1>
+break 'break'	 [StartOfLine]	Loc=</workspace/SYsU-lang/lexer/test.sysu.c:17:1>
+continue 'continue'	 [StartOfLine]	Loc=</workspace/SYsU-lang/lexer/test.sysu.c:18:1>
+return 'return'	 [StartOfLine]	Loc=</workspace/SYsU-lang/lexer/test.sysu.c:19:1>
+numeric_constant '1.2'	 [StartOfLine]	Loc=</workspace/SYsU-lang/lexer/test.sysu.c:20:1>
+plus '+'	 [StartOfLine]	Loc=</workspace/SYsU-lang/lexer/test.sysu.c:21:1>
+minus '-'	 [StartOfLine]	Loc=</workspace/SYsU-lang/lexer/test.sysu.c:22:1>
+exclaim '!'	 [StartOfLine]	Loc=</workspace/SYsU-lang/lexer/test.sysu.c:23:1>
+star '*'	 [StartOfLine]	Loc=</workspace/SYsU-lang/lexer/test.sysu.c:24:1>
+slash '/'	 [StartOfLine]	Loc=</workspace/SYsU-lang/lexer/test.sysu.c:25:1>
+percent '%'	 [StartOfLine]	Loc=</workspace/SYsU-lang/lexer/test.sysu.c:26:1>
+less '<'	 [StartOfLine]	Loc=</workspace/SYsU-lang/lexer/test.sysu.c:27:1>
+greater '>'	 [StartOfLine]	Loc=</workspace/SYsU-lang/lexer/test.sysu.c:28:1>
+lessequal '<='	 [StartOfLine]	Loc=</workspace/SYsU-lang/lexer/test.sysu.c:29:1>
+greaterequal '>='	 [StartOfLine]	Loc=</workspace/SYsU-lang/lexer/test.sysu.c:30:1>
+equalequal '=='	 [StartOfLine]	Loc=</workspace/SYsU-lang/lexer/test.sysu.c:31:1>
+exclaimequal '!='	 [StartOfLine]	Loc=</workspace/SYsU-lang/lexer/test.sysu.c:32:1>
+ampamp '&&'	 [StartOfLine]	Loc=</workspace/SYsU-lang/lexer/test.sysu.c:33:1>
+pipepipe '||'	 [StartOfLine]	Loc=</workspace/SYsU-lang/lexer/test.sysu.c:34:1>
+string_literal '"hello"'	 [StartOfLine]	Loc=</workspace/SYsU-lang/lexer/test.sysu.c:35:1>
+char_constant ''a''	 [StartOfLine]	Loc=</workspace/SYsU-lang/lexer/test.sysu.c:36:1>
+eof ''		Loc=</workspace/SYsU-lang/lexer/test.sysu.c:36:4>
+
+
+\+ {
+  std::fprintf(yyout, "plus '%s'\t\tLoc=<%s:%d:%d>\n", yytext, yyloc.c_str(),
+               yyrow, yycolumn - yyleng);
+  return ~YYEOF;
+}
+- {
+  std::fprintf(yyout, "minus '%s'\t\tLoc=<%s:%d:%d>\n", yytext, yyloc.c_str(),
+               yyrow, yycolumn - yyleng);
+  return ~YYEOF;
+}
+! {
+  std::fprintf(yyout, "exclaim '%s'\t\tLoc=<%s:%d:%d>\n", yytext, yyloc.c_str(),
+               yyrow, yycolumn - yyleng);
+  return ~YYEOF;
+}
+\* {
+  std::fprintf(yyout, "star '%s'\t\tLoc=<%s:%d:%d>\n", yytext, yyloc.c_str(),
+               yyrow, yycolumn - yyleng);
+  return ~YYEOF;
+}
+\/ {
+  std::fprintf(yyout, "slash '%s'\t\tLoc=<%s:%d:%d>\n", yytext, yyloc.c_str(),
+               yyrow, yycolumn - yyleng);
+  return ~YYEOF;
+}
+\% {
+  std::fprintf(yyout, "percent '%s'\t\tLoc=<%s:%d:%d>\n", yytext, yyloc.c_str(),
+               yyrow, yycolumn - yyleng);
+  return ~YYEOF;
+}
+< {
+  std::fprintf(yyout, "less '%s'\t\tLoc=<%s:%d:%d>\n", yytext, yyloc.c_str(),
+               yyrow, yycolumn - yyleng);
+  return ~YYEOF;
+}
+> {
+  std::fprintf(yyout, "greater '%s'\t\tLoc=<%s:%d:%d>\n", yytext, yyloc.c_str(),
+               yyrow, yycolumn - yyleng);
+  return ~YYEOF;
+}
+<= {
+  std::fprintf(yyout, "lessequal '%s'\t\tLoc=<%s:%d:%d>\n", yytext, yyloc.c_str(),
+               yyrow, yycolumn - yyleng);
+  return ~YYEOF;
+}
+>= {
+  std::fprintf(yyout, "greaterequal '%s'\t\tLoc=<%s:%d:%d>\n", yytext, yyloc.c_str(),
+               yyrow, yycolumn - yyleng);
+  return ~YYEOF;
+}
+== {
+  std::fprintf(yyout, "equalequal '%s'\t\tLoc=<%s:%d:%d>\n", yytext, yyloc.c_str(),
+               yyrow, yycolumn - yyleng);
+  return ~YYEOF;
+}
+!= {
+  std::fprintf(yyout, "exclaimequal '%s'\t\tLoc=<%s:%d:%d>\n", yytext, yyloc.c_str(),
+               yyrow, yycolumn - yyleng);
+  return ~YYEOF;
+}
+&& {
+  std::fprintf(yyout, "ampamp '%s'\t\tLoc=<%s:%d:%d>\n", yytext, yyloc.c_str(),
+               yyrow, yycolumn - yyleng);
+  return ~YYEOF;
+}
+|| {
+  std::fprintf(yyout, "pipepipe '%s'\t\tLoc=<%s:%d:%d>\n", yytext, yyloc.c_str(),
+               yyrow, yycolumn - yyleng);
+  return ~YYEOF;
+}
+\".*\" {
+  std::fprintf(yyout, "string_literal '%s'\t\tLoc=<%s:%d:%d>\n", yytext, yyloc.c_str(),
+               yyrow, yycolumn - yyleng);
+  return ~YYEOF;
+}
+\'.*\' {
+  std::fprintf(yyout, "string_literal '%s'\t\tLoc=<%s:%d:%d>\n", yytext, yyloc.c_str(),
+               yyrow, yycolumn - yyleng);
+  return ~YYEOF;
+}
+
+
+rm -rf $HOME/sysu
+cmake -G Ninja \
+  -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+  -DCMAKE_C_COMPILER=clang \
+  -DCMAKE_CXX_COMPILER=clang++ \
+  -DCMAKE_INSTALL_PREFIX=$HOME/sysu \
+  -DCMAKE_PREFIX_PATH="$(llvm-config --cmakedir)" \
+  -DCPACK_SOURCE_IGNORE_FILES=".git/;tester/third_party/" \
+  -B $HOME/sysu/build
+cmake --build $HOME/sysu/build
+cmake --build $HOME/sysu/build -t install
+
+
+
+ sysu-lexer < /workspace/SYsU-lang/lexer/test.sysu.c &> /workspace/SYsU-lang/lexer/sysu.txt
+
+
+
+  ( export PATH=$HOME/sysu/bin:$PATH   CPATH=$HOME/sysu/include:$CPATH   LIBRARY_PATH=$HOME/sysu/lib:$LIBRARY_PATH   LD_LIBRARY_PATH=$HOME/sysu/lib:$LD_LIBRARY_PATH &&   sysu-compiler --unittest=lexer-3 "/workspace/SYsU-lang/tester/*/*.sysu.c" )
+
+
+
+  ( export PATH=$HOME/sysu/bin:$PATH \
+  CPATH=$HOME/sysu/include:$CPATH \
+  LIBRARY_PATH=$HOME/sysu/lib:$LIBRARY_PATH \
+  LD_LIBRARY_PATH=$HOME/sysu/lib:$LD_LIBRARY_PATH && sysu-preprocessor /workspace/SYsU-lang/lexer/test.sysu.c | \
+  clang -cc1 -dump-tokens   &> /workspace/SYsU-lang/lexer/comp_clang.txt )
+
+  ( export PATH=$HOME/sysu/bin:$PATH \
+  CPATH=$HOME/sysu/include:$CPATH \
+  LIBRARY_PATH=$HOME/sysu/lib:$LIBRARY_PATH \
+  LD_LIBRARY_PATH=$HOME/sysu/lib:$LD_LIBRARY_PATH && sysu-preprocessor /workspace/SYsU-lang/lexer/test.sysu.c | \
+  sysu-lexer  &> /workspace/SYsU-lang/lexer/comp_sysu.txt )
+
+  diff /workspace/SYsU-lang/lexer/comp_clang.txt /workspace/SYsU-lang/lexer/comp_sysu.txt &> /workspace/SYsU-lang/lexer/di.txt
+
+
