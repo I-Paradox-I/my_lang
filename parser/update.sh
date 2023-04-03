@@ -1,3 +1,4 @@
+cd /workspace/SYsU-lang/
 rm -rf $HOME/sysu
 cmake -G Ninja \
   -DCMAKE_BUILD_TYPE=RelWithDebInfo \

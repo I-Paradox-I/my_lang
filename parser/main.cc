@@ -79,6 +79,7 @@
   do {                                                                         \
     llvm::errs() << (x);                                                       \
   } while (0)
+
 namespace {
 auto llvmin = llvm::MemoryBuffer::getFileOrSTDIN("-");
 auto input = llvmin.get() -> getBuffer();
@@ -164,7 +165,7 @@ int main() {
   llvm::outs() << root->toJson() << "\n";
 }
 
-#line 168 "main.cc"
+#line 169 "main.cc"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -591,7 +592,7 @@ static const yytype_int8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,   115,   115,   120,   127,   132,   139,   146
+       0,   116,   116,   121,   128,   133,   140,   147
 };
 #endif
 
@@ -1169,64 +1170,64 @@ yyreduce:
   switch (yyn)
     {
   case 2: /* Begin: CompUnit  */
-#line 115 "parser.y"
+#line 116 "parser.y"
                 {
     root = yyvsp[0];
   }
-#line 1177 "main.cc"
+#line 1178 "main.cc"
     break;
 
   case 3: /* CompUnit: GlobalDecl  */
-#line 120 "parser.y"
+#line 121 "parser.y"
                      {
     auto ptr = new Tree("TranslationUnitDecl");
     ptr->addSon(yyvsp[0]);
     yyval = ptr;
   }
-#line 1187 "main.cc"
+#line 1188 "main.cc"
     break;
 
   case 4: /* GlobalDecl: FuncDef  */
-#line 127 "parser.y"
+#line 128 "parser.y"
                     {
     yyval = yyvsp[0];
   }
-#line 1195 "main.cc"
+#line 1196 "main.cc"
     break;
 
   case 5: /* FuncDef: T_INT T_IDENTIFIER T_L_PAREN T_R_PAREN Block  */
-#line 132 "parser.y"
+#line 133 "parser.y"
                                                      {
     auto ptr = new Tree("FunctionDecl", yyvsp[-3]->name);
     delete yyvsp[-3];
     ptr->addSon(yyvsp[0]);
     yyval = ptr;
   }
-#line 1206 "main.cc"
+#line 1207 "main.cc"
     break;
 
   case 6: /* Block: T_L_BRACE Stmt T_R_BRACE  */
-#line 139 "parser.y"
+#line 140 "parser.y"
                                 {
     auto ptr = new Tree("CompoundStmt");
     ptr->addSon(yyvsp[-1]);
     yyval = ptr;
   }
-#line 1216 "main.cc"
+#line 1217 "main.cc"
     break;
 
   case 7: /* Stmt: T_RETURN T_NUMERIC_CONSTANT T_SEMI  */
-#line 146 "parser.y"
+#line 147 "parser.y"
                                          {
     auto ptr = new Tree("ReturnStmt");
     ptr->addSon(yyvsp[-1]);
     yyval = ptr;
 }
-#line 1226 "main.cc"
+#line 1227 "main.cc"
     break;
 
 
-#line 1230 "main.cc"
+#line 1231 "main.cc"
 
       default: break;
     }
@@ -1420,4 +1421,4 @@ yyreturn:
   return yyresult;
 }
 
-#line 152 "parser.y"
+#line 153 "parser.y"

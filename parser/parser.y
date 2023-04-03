@@ -1,8 +1,6 @@
 %code requires
 {
-class Tree;
-}
-%{
+#include "asg.hpp"
 #include "parser.hh"
 #include <vector>
 #include <memory>
@@ -27,41 +25,8 @@ auto wk_getline(char endline = "\n"[0]) {
     ++it;
   return llvm::StringRef(beg, len);
 }
-Tree* root;
+Obj* root;
 } // namespace
-
-// 以下树结构仅供参考，你可以随意修改或定义自己喜欢的形式
-class Tree{
-public:
-  std::string kind;
-  std::string name;
-  std::string value;
-  std::vector<std::unique_ptr<Tree>> sons;
-  Tree(std::string kind="", std::string name="", std::string value=""): kind(kind), name(name), value(value) {}
-  void addSon(Tree* son){ sons.emplace_back(std::unique_ptr<Tree>(son)); }
-  void addSon(std::unique_ptr<Tree>&& son){ sons.emplace_back(std::move(son)); }
-  llvm::json::Value toJson() const {
-    llvm::json::Object tmp{
-      {"kind", kind},
-      {"name", name},
-      {"value", value},
-      {"inner", llvm::json::Array{}}
-    };
-    for(auto&& it: sons) tmp.get("inner")->getAsArray()->push_back(it->toJson());
-    return tmp;
-  }
-  void print(int depth=0) const {
-    yyerror("|");
-    for(int i=0;i<depth;++i) yyerror(" ");
-    yyerror("-"+kind+" "+name+" "+value);
-    for(auto&& it: sons)
-    {
-      yyerror("\n");
-      it->print(depth+1);
-    }
-    if(!depth) yyerror("\n\n");
-  }
-};
 
 auto yylex() {
   auto tk = wk_getline();

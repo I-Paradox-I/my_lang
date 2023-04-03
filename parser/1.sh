@@ -6,7 +6,7 @@ test_file_path=${1:-'/workspace/SYsU-lang/tester/functional/000_main.sysu.c'}
   LIBRARY_PATH=$HOME/sysu/lib:$LIBRARY_PATH \
   LD_LIBRARY_PATH=$HOME/sysu/lib:$LD_LIBRARY_PATH &&
   clang -E $test_file_path |
-  clang -cc1 -ast-dump=json  &>  /workspace/SYsU-lang/parser/ori_json.txt &&
+  clang -cc1 -ast-dump=json  &>  /workspace/SYsU-lang/parser/ori_json.json &&
   clang -E $test_file_path |
   clang -cc1 -ast-dump &>  /workspace/SYsU-lang/parser/ori_tree.txt ) 
 

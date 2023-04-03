@@ -1,5 +1,4 @@
 int main(){
-    int a, b, c;
-    if (b == c)
-        return 1;
+    int a = 3;
+    return 3;
 }
