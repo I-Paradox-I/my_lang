@@ -1,22 +1,20 @@
-TranslationUnitDecl 0x11b4528 <<invalid sloc>> <invalid sloc>
-|-TypedefDecl 0x11b4de8 <<invalid sloc>> <invalid sloc> implicit __int128_t '__int128'
-| `-BuiltinType 0x11b4ac0 '__int128'
-|-TypedefDecl 0x11b4e58 <<invalid sloc>> <invalid sloc> implicit __uint128_t 'unsigned __int128'
-| `-BuiltinType 0x11b4ae0 'unsigned __int128'
-|-TypedefDecl 0x11b5160 <<invalid sloc>> <invalid sloc> implicit __NSConstantString 'struct __NSConstantString_tag'
-| `-RecordType 0x11b4f30 'struct __NSConstantString_tag'
-|   `-Record 0x11b4eb0 '__NSConstantString_tag'
-|-TypedefDecl 0x11b5208 <<invalid sloc>> <invalid sloc> implicit __builtin_ms_va_list 'char *'
-| `-PointerType 0x11b51c0 'char *'
-|   `-BuiltinType 0x11b45c0 'char'
-|-TypedefDecl 0x11f3bf0 <<invalid sloc>> <invalid sloc> implicit __builtin_va_list 'struct __va_list_tag [1]'
-| `-ConstantArrayType 0x11b54a0 'struct __va_list_tag [1]' 1 
-|   `-RecordType 0x11b52e0 'struct __va_list_tag'
-|     `-Record 0x11b5260 '__va_list_tag'
-`-FunctionDecl 0x11f3ca8 <test.sysu.c:1:1, line:4:1> line:1:5 main 'int ()'
-  `-CompoundStmt 0x11f3e78 <col:11, line:4:1>
-    |-DeclStmt 0x11f3e30 <line:2:5, col:14>
-    | `-VarDecl 0x11f3da8 <col:5, col:13> col:9 a 'int' cinit
-    |   `-IntegerLiteral 0x11f3e10 <col:13> 'int' 3
-    `-ReturnStmt 0x11f3e68 <line:3:5, col:12>
-      `-IntegerLiteral 0x11f3e48 <col:12> 'int' 3
+TranslationUnitDecl 0x1dca548 <<invalid sloc>> <invalid sloc>
+|-TypedefDecl 0x1dcae08 <<invalid sloc>> <invalid sloc> implicit __int128_t '__int128'
+| `-BuiltinType 0x1dcaae0 '__int128'
+|-TypedefDecl 0x1dcae78 <<invalid sloc>> <invalid sloc> implicit __uint128_t 'unsigned __int128'
+| `-BuiltinType 0x1dcab00 'unsigned __int128'
+|-TypedefDecl 0x1dcb180 <<invalid sloc>> <invalid sloc> implicit __NSConstantString 'struct __NSConstantString_tag'
+| `-RecordType 0x1dcaf50 'struct __NSConstantString_tag'
+|   `-Record 0x1dcaed0 '__NSConstantString_tag'
+|-TypedefDecl 0x1dcb228 <<invalid sloc>> <invalid sloc> implicit __builtin_ms_va_list 'char *'
+| `-PointerType 0x1dcb1e0 'char *'
+|   `-BuiltinType 0x1dca5e0 'char'
+|-TypedefDecl 0x1e09c70 <<invalid sloc>> <invalid sloc> implicit __builtin_va_list 'struct __va_list_tag [1]'
+| `-ConstantArrayType 0x1dcb4c0 'struct __va_list_tag [1]' 1 
+|   `-RecordType 0x1dcb300 'struct __va_list_tag'
+|     `-Record 0x1dcb280 '__va_list_tag'
+|-VarDecl 0x1e09ce0 </workspace/SYsU-lang/parser/test.sysu.c:1:1, col:5> col:5 a 'int'
+`-FunctionDecl 0x1e09de8 <line:2:1, line:4:1> line:2:5 main 'int ()'
+  `-CompoundStmt 0x1e09eb8 <col:12, line:4:1>
+    `-ReturnStmt 0x1e09ea8 <line:3:5, col:12>
+      `-IntegerLiteral 0x1e09e88 <col:12> 'int' 0

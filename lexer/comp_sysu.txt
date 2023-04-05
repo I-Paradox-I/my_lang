@@ -1,9 +1,6 @@
-int 'int'	[StartOfLine] Loc=</workspace/SYsU-lang/lexer/test.sysu.c:1:1>
-identifier 'a'	[LeadingSpace] Loc=</workspace/SYsU-lang/lexer/test.sysu.c:1:5>
-equal '='	[LeadingSpace] Loc=</workspace/SYsU-lang/lexer/test.sysu.c:1:7>
-numeric_constant '3'	[LeadingSpace] Loc=</workspace/SYsU-lang/lexer/test.sysu.c:1:9>
-semi ';'	Loc=</workspace/SYsU-lang/lexer/test.sysu.c:1:10>
-return 'return'	[StartOfLine] [LeadingSpace] Loc=</workspace/SYsU-lang/lexer/test.sysu.c:2:5>
-identifier 'test'	[StartOfLine] Loc=</workspace/SYsU-lang/lexer/test.sysu.c:3:1>
-identifier 'pass'	[LeadingSpace] Loc=</workspace/SYsU-lang/lexer/test.sysu.c:3:6>
-eof ''		Loc=</workspace/SYsU-lang/lexer/test.sysu.c:3:10>
+char 'char'	[StartOfLine] Loc=</workspace/SYsU-lang/lexer/test.sysu.c:1:1>
+identifier 'a'	[LeadingSpace] Loc=</workspace/SYsU-lang/lexer/test.sysu.c:1:6>
+equal '='	[LeadingSpace] Loc=</workspace/SYsU-lang/lexer/test.sysu.c:1:8>
+char_constant ''a''	[LeadingSpace] Loc=</workspace/SYsU-lang/lexer/test.sysu.c:1:10>
+semi ';'	Loc=</workspace/SYsU-lang/lexer/test.sysu.c:1:13>
+eof ''		Loc=</workspace/SYsU-lang/lexer/test.sysu.c:1:14>

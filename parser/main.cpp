@@ -3,6 +3,8 @@
 #include "Typing.hpp"
 using namespace std;
 
-int main(){
-
+int main() {
+  yyparse();
+  ToJson toJson;
+  llvm::outs() << root->accept(toJson) << "\n";
 }

@@ -489,11 +489,11 @@ return {
   yyspace = 0;
   return ~YYEOF;
 }
-\'[^"\\]|(\\[onrtvabf'"\\?])\' {
+\'([^'\\]|(\\[onrtvabf'"\\?]))\' {
   std::string s = "";
   if(yynewline) s.append("[StartOfLine] ");
   if(yyspace) s.append("[LeadingSpace] ");
-  std::fprintf(yyout, "char '%s'\t%sLoc=<%s:%d:%d>\n", yytext,
+  std::fprintf(yyout, "char_constant '%s'\t%sLoc=<%s:%d:%d>\n", yytext,
                s.c_str(), yyloc.c_str(), yyrow, yycolumn - yyleng);
   yynewline = 0;
   yyspace = 0;

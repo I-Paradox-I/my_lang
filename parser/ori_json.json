@@ -1,5 +1,5 @@
 {
-  "id": "0x1391558",
+  "id": "0x1827578",
   "kind": "TranslationUnitDecl",
   "loc": {},
   "range": {
@@ -8,7 +8,7 @@
   },
   "inner": [
     {
-      "id": "0x1391e18",
+      "id": "0x1827e38",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -22,7 +22,7 @@
       },
       "inner": [
         {
-          "id": "0x1391af0",
+          "id": "0x1827b10",
           "kind": "BuiltinType",
           "type": {
             "qualType": "__int128"
@@ -31,7 +31,7 @@
       ]
     },
     {
-      "id": "0x1391e88",
+      "id": "0x1827ea8",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -45,7 +45,7 @@
       },
       "inner": [
         {
-          "id": "0x1391b10",
+          "id": "0x1827b30",
           "kind": "BuiltinType",
           "type": {
             "qualType": "unsigned __int128"
@@ -54,7 +54,7 @@
       ]
     },
     {
-      "id": "0x1392190",
+      "id": "0x18281b0",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -68,13 +68,13 @@
       },
       "inner": [
         {
-          "id": "0x1391f60",
+          "id": "0x1827f80",
           "kind": "RecordType",
           "type": {
             "qualType": "struct __NSConstantString_tag"
           },
           "decl": {
-            "id": "0x1391ee0",
+            "id": "0x1827f00",
             "kind": "RecordDecl",
             "name": "__NSConstantString_tag"
           }
@@ -82,7 +82,7 @@
       ]
     },
     {
-      "id": "0x1392238",
+      "id": "0x1828258",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -96,14 +96,14 @@
       },
       "inner": [
         {
-          "id": "0x13921f0",
+          "id": "0x1828210",
           "kind": "PointerType",
           "type": {
             "qualType": "char *"
           },
           "inner": [
             {
-              "id": "0x13915f0",
+              "id": "0x1827610",
               "kind": "BuiltinType",
               "type": {
                 "qualType": "char"
@@ -114,7 +114,7 @@
       ]
     },
     {
-      "id": "0x13d0c20",
+      "id": "0x1866ca0",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -128,7 +128,7 @@
       },
       "inner": [
         {
-          "id": "0x13924d0",
+          "id": "0x18284f0",
           "kind": "ConstantArrayType",
           "type": {
             "qualType": "struct __va_list_tag [1]"
@@ -136,13 +136,13 @@
           "size": 1,
           "inner": [
             {
-              "id": "0x1392310",
+              "id": "0x1828330",
               "kind": "RecordType",
               "type": {
                 "qualType": "struct __va_list_tag"
               },
               "decl": {
-                "id": "0x1392290",
+                "id": "0x18282b0",
                 "kind": "RecordDecl",
                 "name": "__va_list_tag"
               }
@@ -152,25 +152,53 @@
       ]
     },
     {
-      "id": "0x13d0cd8",
-      "kind": "FunctionDecl",
+      "id": "0x1866d10",
+      "kind": "VarDecl",
       "loc": {
-        "offset": 143,
+        "offset": 199,
         "file": "<stdin>",
         "line": 8,
-        "presumedFile": "test.sysu.c",
+        "presumedFile": "/workspace/SYsU-lang/parser/test.sysu.c",
         "presumedLine": 1,
+        "col": 5,
+        "tokLen": 1
+      },
+      "range": {
+        "begin": {
+          "offset": 195,
+          "col": 1,
+          "tokLen": 3
+        },
+        "end": {
+          "offset": 199,
+          "col": 5,
+          "tokLen": 1
+        }
+      },
+      "name": "a",
+      "mangledName": "a",
+      "type": {
+        "qualType": "int"
+      }
+    },
+    {
+      "id": "0x1866e18",
+      "kind": "FunctionDecl",
+      "loc": {
+        "offset": 206,
+        "line": 9,
+        "presumedLine": 2,
         "col": 5,
         "tokLen": 4
       },
       "range": {
         "begin": {
-          "offset": 139,
+          "offset": 202,
           "col": 1,
           "tokLen": 3
         },
         "end": {
-          "offset": 180,
+          "offset": 229,
           "line": 11,
           "presumedLine": 4,
           "col": 1,
@@ -184,18 +212,18 @@
       },
       "inner": [
         {
-          "id": "0x13d0ea8",
+          "id": "0x1866ee8",
           "kind": "CompoundStmt",
           "range": {
             "begin": {
-              "offset": 149,
-              "line": 8,
-              "presumedLine": 1,
-              "col": 11,
+              "offset": 213,
+              "line": 9,
+              "presumedLine": 2,
+              "col": 12,
               "tokLen": 1
             },
             "end": {
-              "offset": 180,
+              "offset": 229,
               "line": 11,
               "presumedLine": 4,
               "col": 1,
@@ -204,104 +232,34 @@
           },
           "inner": [
             {
-              "id": "0x13d0e60",
-              "kind": "DeclStmt",
-              "range": {
-                "begin": {
-                  "offset": 155,
-                  "line": 9,
-                  "presumedLine": 2,
-                  "col": 5,
-                  "tokLen": 3
-                },
-                "end": {
-                  "offset": 164,
-                  "col": 14,
-                  "tokLen": 1
-                }
-              },
-              "inner": [
-                {
-                  "id": "0x13d0dd8",
-                  "kind": "VarDecl",
-                  "loc": {
-                    "offset": 159,
-                    "col": 9,
-                    "tokLen": 1
-                  },
-                  "range": {
-                    "begin": {
-                      "offset": 155,
-                      "col": 5,
-                      "tokLen": 3
-                    },
-                    "end": {
-                      "offset": 163,
-                      "col": 13,
-                      "tokLen": 1
-                    }
-                  },
-                  "name": "a",
-                  "mangledName": "a",
-                  "type": {
-                    "qualType": "int"
-                  },
-                  "init": "c",
-                  "inner": [
-                    {
-                      "id": "0x13d0e40",
-                      "kind": "IntegerLiteral",
-                      "range": {
-                        "begin": {
-                          "offset": 163,
-                          "col": 13,
-                          "tokLen": 1
-                        },
-                        "end": {
-                          "offset": 163,
-                          "col": 13,
-                          "tokLen": 1
-                        }
-                      },
-                      "type": {
-                        "qualType": "int"
-                      },
-                      "valueCategory": "rvalue",
-                      "value": "3"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "id": "0x13d0e98",
+              "id": "0x1866ed8",
               "kind": "ReturnStmt",
               "range": {
                 "begin": {
-                  "offset": 170,
+                  "offset": 219,
                   "line": 10,
                   "presumedLine": 3,
                   "col": 5,
                   "tokLen": 6
                 },
                 "end": {
-                  "offset": 177,
+                  "offset": 226,
                   "col": 12,
                   "tokLen": 1
                 }
               },
               "inner": [
                 {
-                  "id": "0x13d0e78",
+                  "id": "0x1866eb8",
                   "kind": "IntegerLiteral",
                   "range": {
                     "begin": {
-                      "offset": 177,
+                      "offset": 226,
                       "col": 12,
                       "tokLen": 1
                     },
                     "end": {
-                      "offset": 177,
+                      "offset": 226,
                       "col": 12,
                       "tokLen": 1
                     }
@@ -310,7 +268,7 @@
                     "qualType": "int"
                   },
                   "valueCategory": "rvalue",
-                  "value": "3"
+                  "value": "0"
                 }
               ]
             }
