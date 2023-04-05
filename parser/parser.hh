@@ -48,6 +48,7 @@ extern int yydebug;
 #line 2 "parser.y"
 
 class Tree;
+Obj* root;
 
 #line 53 "parser.hh"
 
