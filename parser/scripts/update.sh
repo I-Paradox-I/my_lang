@@ -1,3 +1,4 @@
+clear
 cd /workspace/SYsU-lang/
 rm -rf $HOME/sysu
 cmake -G Ninja \

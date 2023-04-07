@@ -1,0 +1,11 @@
+kind: TranslationUnitDecl
+inner:
+- kind: FunctionDecl
+  name: main
+  inner:
+  - kind: CompoundStmt
+    inner:
+    - kind: ReturnStmt
+      inner:
+      - kind: IntegerLiteral
+        value: '3'

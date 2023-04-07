@@ -1,0 +1,183 @@
+kind: TranslationUnitDecl
+inner:
+- kind: TypedefDecl
+  type:
+    qualType: const int
+  name: a
+  inner:
+  - kind: IntegerLiteral
+    type:
+      qualType: int
+    value: '0'
+- kind: VarDecl
+  type:
+    qualType: const float
+  name: b
+  inner:
+  - kind: ImplicitCastExpr
+    type:
+      qualType: float
+    inner:
+    - kind: FloatingLiteral
+      type:
+        qualType: double
+      value: '2'
+- kind: VarDecl
+  type:
+    qualType: const long long
+  name: c
+  inner:
+  - kind: ImplicitCastExpr
+    type:
+      qualType: long long
+    inner:
+    - kind: IntegerLiteral
+      type:
+        qualType: int
+      value: '2'
+- kind: VarDecl
+  type:
+    qualType: const double
+  name: d
+  inner:
+  - kind: FloatingLiteral
+    type:
+      qualType: double
+    value: '9.9999999999999995E-7'
+- kind: VarDecl
+  type:
+    qualType: int
+  name: e
+  inner:
+  - kind: BinaryOperator
+    type:
+      qualType: int
+    inner:
+    - kind: BinaryOperator
+      type:
+        qualType: int
+      inner:
+      - kind: IntegerLiteral
+        type:
+          qualType: int
+        value: '1'
+      - kind: IntegerLiteral
+        type:
+          qualType: int
+        value: '2'
+    - kind: BinaryOperator
+      type:
+        qualType: int
+      inner:
+      - kind: BinaryOperator
+        type:
+          qualType: int
+        inner:
+        - kind: BinaryOperator
+          type:
+            qualType: int
+          inner:
+          - kind: IntegerLiteral
+            type:
+              qualType: int
+            value: '3'
+          - kind: IntegerLiteral
+            type:
+              qualType: int
+            value: '4'
+        - kind: IntegerLiteral
+          type:
+            qualType: int
+          value: '5'
+      - kind: IntegerLiteral
+        type:
+          qualType: int
+        value: '6'
+- kind: VarDecl
+  type:
+    qualType: float
+  name: f
+  inner:
+  - kind: ImplicitCastExpr
+    type:
+      qualType: float
+    inner:
+    - kind: BinaryOperator
+      type:
+        qualType: int
+      inner:
+      - kind: BinaryOperator
+        type:
+          qualType: int
+        inner:
+        - kind: IntegerLiteral
+          type:
+            qualType: int
+          value: '1'
+        - kind: IntegerLiteral
+          type:
+            qualType: int
+          value: '2'
+      - kind: BinaryOperator
+        type:
+          qualType: int
+        inner:
+        - kind: BinaryOperator
+          type:
+            qualType: int
+          inner:
+          - kind: BinaryOperator
+            type:
+              qualType: int
+            inner:
+            - kind: IntegerLiteral
+              type:
+                qualType: int
+              value: '3'
+            - kind: IntegerLiteral
+              type:
+                qualType: int
+              value: '4'
+          - kind: IntegerLiteral
+            type:
+              qualType: int
+            value: '5'
+        - kind: IntegerLiteral
+          type:
+            qualType: int
+          value: '6'
+- kind: VarDecl
+  type:
+    qualType: double
+  name: g
+  inner:
+  - kind: FloatingLiteral
+    type:
+      qualType: double
+    value: '0.29999999999999999'
+- kind: VarDecl
+  type:
+    qualType: char
+  name: h
+  inner:
+  - kind: ImplicitCastExpr
+    type:
+      qualType: char
+    inner:
+    - kind: CharacterLiteral
+      type:
+        qualType: int
+      value: 10
+- kind: VarDecl
+  type:
+    qualType: char *
+  name: str
+  inner:
+  - kind: ImplicitCastExpr
+    type:
+      qualType: char *
+    inner:
+    - kind: StringLiteral
+      type:
+        qualType: char [13]
+      value: '"hello world!"'

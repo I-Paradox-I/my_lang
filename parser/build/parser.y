@@ -1,5 +1,8 @@
 %code requires
 {
+class Tree;
+}
+%{
 #include "asg.hpp"
 #include <vector>
 #include <memory>
@@ -23,15 +26,16 @@ auto wk_getline(char endline = "\n"[0]) {
   if (it != end && *it == endline)
     ++it;
   return llvm::StringRef(beg, len);
-}
+  }
+Obj* root;
+Mgr gMgr;
+} // namespace
 
 union YYSTYPE {
   Obj* obj;
 	Decl* decl;
 	Expr* expr;
 };
-
-} // namespace
 
 auto yylex() {
   auto tk = wk_getline();
@@ -66,17 +70,17 @@ auto yylex() {
   if (t == "return")
     return T_RETURN;
   if (t == "l_paren")
-    return T_L_PAREN;
+    return T_LEFT_PAREN;
   if (t == "r_paren")
-    return T_R_PAREN;
+    return T_RIGHT_PAREN;
   if (t == "l_square")
-    return T_L_SQUARE;
+    return T_LEFT_SQUARE;
   if (t == "r_square")
-    return T_R_SQUARE;
+    return T_RIGHT_SQUARE;
   if (t == "l_brace")
-    return T_L_BRACE;
+    return T_LEFT_BRACE;
   if (t == "r_brace")
-    return T_R_BRACE;
+    return T_RIGHT_BRACE;
   if (t == "comma")
     return T_COMMA;
   if (t == "semi")
@@ -114,27 +118,61 @@ auto yylex() {
   if (t == "ellipsis")
     return T_ELLIPSIS;
   if (t == "identifier") { //TODO
+    auto decl = gMgr.make<Decl>();
+    decl->name = s;
+    yylval.decl = decl;
     return T_IDENTIFIER;
   }    
   if (t == "numeric_constant") { //TODO
-    return T_NUMERIC_CONSTANT;
+    //浮点数
+    if (s.find('.') != std::string::npos || s.find('p') != std::string::npos || s.find('e') != std::string::npos)
+    {
+      auto expr = gMgr.make<FloatingLiteral>();
+      expr->kind = "FloatingLiteral";
+      expr->value = s;
+      expr->val = std::stod((stirng)(s));      
+      llvm::StringRef str(expr->value);
+      llvm::APFloat apf(0.0);
+      apf.convertFromString(str, llvm::APFloat::rmNearestTiesToEven);
+      llvm::SmallString<16> Buffer;
+      apf.toString(Buffer);
+      expr->value = Buffer.c_str();
+      yylval.expr = expr;
+      return T_FLOATING_LITERAL;
+    }
+    else{ //整数
+      auto expr = gMgr.make<IntegerLiteral>();
+      expr->kind = "IntegerLiteral";
+      expr->value = s;
+      expr->val = std::stoi((string)(s));
+      yylval.expr = expr;
+      return T_INTEGER_LITERAL;
+    }
   }  
   if (t == "string_literal") { //TODO
+    auto expr = gMgr.make<StringLiteral>();
+    expr->kind = "StringLiteral";
+    expr->value = s;
+    yylval.expr = expr;
     return T_STRING_LITERAL;
   }
   if (t == "char_constant") { //TODO
+    auto expr = gMgr.make<CharacterLiteral>();
+    expr->kind = "CharacterLiteral";
+    expr->value = s;
+    expr->val = s[0];
+    yylval.expr = expr
     return T_CHAR_CONSTANT;
   }
   return YYEOF;
 }
 
-Obj* root = nullptr;
 
 %}
-%define api.value.type { YYSTYPE }
+%define api.value.type {union YYSTYPE }
 
 // TO-DO：你需要在这里补充更多的TOKEN
-%start Begin
+%start start
 %token T_VOID
 %token T_CONST
 %token T_CHAR
@@ -149,74 +187,53 @@ Obj* root = nullptr;
 %token T_BREAK
 %token T_CONTINUE
 %token T_RETURN
-%token T_L_PAREN
-%token T_R_PAREN
-%token T_L_SQUARE
-%token T_R_SQUARE
-%token T_L_BRACE
-%token T_R_BRACE
-%token T_COMMA
+%token T_LEFT_BRACE
+%token T_RIGHT_BRACE
 %token T_SEMI
-%token T_EQUAL
-%token T_EXCLAIM
-%token T_PLUS
-%token T_MINUS
-%token T_STAR
-%token T_SLASH
-%token T_PERCENT
-%token T_LESS
-%token T_GREATER
-%token T_LESSEQUAL
-%token T_GREATEREQUAL
-%token T_EQUALEQUAL
-%token T_EXCLAIMEQUAL
-%token T_AMPAMP
-%token T_PIPEPIPE
+
+%left T_COMMA
+%right T_EQUAL
+%left T_PIPEPIPE
+%left T_AMPAMP
+%left T_EQUALEQUAL T_EXCLAIMEQUAL
+%left T_LESS T_GREATER T_LESSEQUAL T_GREATEREQUAL
+%left T_PLUS T_MINUS
+%left T_STAR T_SLASH T_PERCENT
+%left T_EXCLAIM
+%left T_LEFT_SQUARE T_RIGHT_SQUARE
+%left T_LEFT_PAREN T_RIGHT_PAREN
+
 %token T_ELLIPSIS
-%token T_IDENTIFIER
-%token T_NUMERIC_CONSTANT
-%token T_STRING_LITERAL
-%token T_CHAR_CONSTANT
+%token <decl> T_IDENTIFIER
+%token <expr> T_INTEGER_LITERAL
+%token <expr> T_FLOATING_LITERAL
+%token <expr> T_STRING_LITERAL
+%token <expr> T_CHAR_CONSTANT
 
-
+%nterm <decl> start
+%nterm <decl> TranslationUnitDecl
+%nterm <decl> TypedefDecl
 
 
 %%
-Begin: CompUnit {
+start: TranslationUnitDecl {
     root = $1;
   }
   ;
 
-CompUnit: GlobalDecl {
-    auto ptr = new Tree("TranslationUnitDecl");
-    ptr->addSon($1);
-    $$ = ptr;
+TranslationUnitDecl: TypedefDecl {
+    auto decl = gMgr.make<TranslationUnitDecl>()
+    decl->inner.push_back($1);
+    $$ = decl;
   }
 	;
 
-GlobalDecl: FuncDef {
-    $$ = $1;
-  }
-	;
-
-FuncDef:T_INT T_IDENTIFIER T_L_PAREN T_R_PAREN Block {
-    auto ptr = new Tree("FunctionDecl", $2->name);
-    delete $2;
-    ptr->addSon($5);
-    $$ = ptr;
-  }
-  ;
-Block: T_L_BRACE Stmt T_R_BRACE {
-    auto ptr = new Tree("CompoundStmt");
-    ptr->addSon($2);
-    $$ = ptr;
+TypedefDecl: T_INT T_IDENTIFIER T_EQUAL T_INTEGER_LITERAL T_SEMI{
+    auto decl = gMgr.make<TypedefDecl>()
+    decl->name = $2->name;
+    decl->inner.push_back($4);
+    $$ = decl;
   }
   ;
 
-Stmt: T_RETURN T_NUMERIC_CONSTANT T_SEMI {
-    auto ptr = new Tree("ReturnStmt");
-    ptr->addSon($2);
-    $$ = ptr;
-}
-// TO-DO：你需要在这里实现文法和树，通过测例
 %%

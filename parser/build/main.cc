@@ -67,9 +67,9 @@
 
 
 /* First part of user prologue.  */
-#line 5 "parser.y"
+#line 5 "/workspace/SYsU-lang/parser/build/parser.y"
 
-#include "parser.hh"
+#include "asg.hpp"
 #include <vector>
 #include <memory>
 #include <llvm/Support/JSON.h>
@@ -92,80 +92,150 @@ auto wk_getline(char endline = "\n"[0]) {
   if (it != end && *it == endline)
     ++it;
   return llvm::StringRef(beg, len);
-}
-Tree* root;
+  }
+Obj* root;
+Mgr gMgr;
 } // namespace
 
-// 以下树结构仅供参考，你可以随意修改或定义自己喜欢的形式
-class Tree{
-public:
-  std::string kind;
-  std::string name;
-  std::string value;
-  std::vector<std::unique_ptr<Tree>> sons;
-  Tree(std::string kind="", std::string name="", std::string value=""): kind(kind), name(name), value(value) {}
-  void addSon(Tree* son){ sons.emplace_back(std::unique_ptr<Tree>(son)); }
-  void addSon(std::unique_ptr<Tree>&& son){ sons.emplace_back(std::move(son)); }
-  llvm::json::Value toJson() const {
-    llvm::json::Object tmp{
-      {"kind", kind},
-      {"name", name},
-      {"value", value},
-      {"inner", llvm::json::Array{}}
-    };
-    for(auto&& it: sons) tmp.get("inner")->getAsArray()->push_back(it->toJson());
-    return tmp;
-  }
-  void print(int depth=0) const {
-    yyerror("|");
-    for(int i=0;i<depth;++i) yyerror(" ");
-    yyerror("-"+kind+" "+name+" "+value);
-    for(auto&& it: sons)
-    {
-      yyerror("\n");
-      it->print(depth+1);
-    }
-    if(!depth) yyerror("\n\n");
-  }
+union YYSTYPE {
+  Obj* obj;
+	Decl* decl;
+	Expr* expr;
 };
 
 auto yylex() {
   auto tk = wk_getline();
   auto b = tk.find("'") + 1, e = tk.rfind("'");
   auto s = tk.substr(b, e - b).str(), t = tk.substr(0, tk.find(" ")).str();
-  if (t == "numeric_constant") {
-    yylval = new Tree("IntegerLiteral", "", s);
-    return T_NUMERIC_CONSTANT;
-  }
-  if (t == "identifier") {
-    yylval = new Tree("id", s);
-    return T_IDENTIFIER;
-  }
+  if (t == "void")
+    return T_VOID;
+  if (t == "const")
+    return T_CONST;
+  if (t == "char")
+    return T_CHAR;
+  if (t == "long")
+    return T_LONG;
   if (t == "int")
     return T_INT;
+  if (t == "float")
+    return T_FLOAT;
+  if (t == "double")
+    return T_DOUBLE;  
+  if (t == "if")
+    return T_IF;
+  if (t == "else")
+    return T_ELSE;
+  if (t == "do")
+    return T_DO;
+  if (t == "while")
+    return T_WHILE;
+  if (t == "break")
+    return T_BREAK;
+  if (t == "continue")
+    return T_CONTINUE;
   if (t == "return")
     return T_RETURN;
+  if (t == "l_paren")
+    return T_LEFT_PAREN;
+  if (t == "r_paren")
+    return T_RIGHT_PAREN;
+  if (t == "l_square")
+    return T_LEFT_SQUARE;
+  if (t == "r_square")
+    return T_RIGHT_SQUARE;
+  if (t == "l_brace")
+    return T_LEFT_BRACE;
+  if (t == "r_brace")
+    return T_RIGHT_BRACE;
+  if (t == "comma")
+    return T_COMMA;
   if (t == "semi")
     return T_SEMI;
-  if (t == "l_paren")
-    return T_L_PAREN;
-  if (t == "r_paren")
-    return T_R_PAREN;
-  if (t == "l_brace")
-    return T_L_BRACE;
-  if (t == "r_brace")
-    return T_R_BRACE;
-// TO-DO：你需要在这里补充更多的TOKEN
+  if (t == "equal")
+    return T_EQUAL;  
+  if (t == "exclaim")
+    return T_EXCLAIM;
+  if (t == "plus")
+    return T_PLUS;  
+  if (t == "minus")
+    return T_MINUS;
+  if (t == "star")
+    return T_STAR;
+  if (t == "slash")
+    return T_SLASH;  
+  if (t == "percent")
+    return T_PERCENT;  
+  if (t == "less")
+    return T_LESS;  
+  if (t == "greater")
+    return T_GREATER;  
+  if (t == "lessequal")
+    return T_LESSEQUAL;
+  if (t == "greaterequal")
+    return T_GREATEREQUAL;
+  if (t == "equalequal")
+    return T_EQUALEQUAL;
+  if (t == "exclaimequal")
+    return T_EXCLAIMEQUAL;
+  if (t == "ampamp")
+    return T_AMPAMP;
+  if (t == "pipepipe")
+    return T_PIPEPIPE;
+  if (t == "ellipsis")
+    return T_ELLIPSIS;
+  if (t == "identifier") { //TODO
+    auto decl = gMgr.make<Decl>();
+    decl->name = s;
+    yylval.decl = decl;
+    return T_IDENTIFIER;
+  }    
+  if (t == "numeric_constant") { //TODO
+    //浮点数
+    if (s.find('.') != std::string::npos || s.find('p') != std::string::npos || s.find('e') != std::string::npos)
+    {
+      auto expr = gMgr.make<FloatingLiteral>();
+      expr->kind = "FloatingLiteral";
+      expr->value = s;
+      expr->val = std::stod((stirng)(s));      
+      llvm::StringRef str(expr->value);
+      llvm::APFloat apf(0.0);
+      apf.convertFromString(str, llvm::APFloat::rmNearestTiesToEven);
+      llvm::SmallString<16> Buffer;
+      apf.toString(Buffer);
+      expr->value = Buffer.c_str();
+      yylval.expr = expr;
+      return T_FLOATING_LITERAL;
+    }
+    else{ //整数
+      auto expr = gMgr.make<IntegerLiteral>();
+      expr->kind = "IntegerLiteral";
+      expr->value = s;
+      expr->val = std::stoi((string)(s));
+      yylval.expr = expr;
+      return T_INTEGER_LITERAL;
+    }
+  }  
+  if (t == "string_literal") { //TODO
+    auto expr = gMgr.make<StringLiteral>();
+    expr->kind = "StringLiteral";
+    expr->value = s;
+    yylval.expr = expr;
+    return T_STRING_LITERAL;
+  }
+  if (t == "char_constant") { //TODO
+    auto expr = gMgr.make<CharacterLiteral>();
+    expr->kind = "CharacterLiteral";
+    expr->value = s;
+    expr->val = s[0];
+    yylval.expr = expr
+    return T_CHAR_CONSTANT;
+  }
   return YYEOF;
 }
 
-int main() {
-  yyparse();
-  root->print();
-  llvm::outs() << root->toJson() << "\n";
-}
 
-#line 169 "main.cc"
+
+#line 239 "/workspace/SYsU-lang/parser/build/main.cc"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -196,22 +266,53 @@ enum yysymbol_kind_t
   YYSYMBOL_YYEOF = 0,                      /* "end of file"  */
   YYSYMBOL_YYerror = 1,                    /* error  */
   YYSYMBOL_YYUNDEF = 2,                    /* "invalid token"  */
-  YYSYMBOL_T_NUMERIC_CONSTANT = 3,         /* T_NUMERIC_CONSTANT  */
-  YYSYMBOL_T_IDENTIFIER = 4,               /* T_IDENTIFIER  */
-  YYSYMBOL_T_INT = 5,                      /* T_INT  */
-  YYSYMBOL_T_RETURN = 6,                   /* T_RETURN  */
-  YYSYMBOL_T_SEMI = 7,                     /* T_SEMI  */
-  YYSYMBOL_T_L_PAREN = 8,                  /* T_L_PAREN  */
-  YYSYMBOL_T_R_PAREN = 9,                  /* T_R_PAREN  */
-  YYSYMBOL_T_L_BRACE = 10,                 /* T_L_BRACE  */
-  YYSYMBOL_T_R_BRACE = 11,                 /* T_R_BRACE  */
-  YYSYMBOL_YYACCEPT = 12,                  /* $accept  */
-  YYSYMBOL_Begin = 13,                     /* Begin  */
-  YYSYMBOL_CompUnit = 14,                  /* CompUnit  */
-  YYSYMBOL_GlobalDecl = 15,                /* GlobalDecl  */
-  YYSYMBOL_FuncDef = 16,                   /* FuncDef  */
-  YYSYMBOL_Block = 17,                     /* Block  */
-  YYSYMBOL_Stmt = 18                       /* Stmt  */
+  YYSYMBOL_T_VOID = 3,                     /* T_VOID  */
+  YYSYMBOL_T_CONST = 4,                    /* T_CONST  */
+  YYSYMBOL_T_CHAR = 5,                     /* T_CHAR  */
+  YYSYMBOL_T_LONG = 6,                     /* T_LONG  */
+  YYSYMBOL_T_INT = 7,                      /* T_INT  */
+  YYSYMBOL_T_FLOAT = 8,                    /* T_FLOAT  */
+  YYSYMBOL_T_DOUBLE = 9,                   /* T_DOUBLE  */
+  YYSYMBOL_T_IF = 10,                      /* T_IF  */
+  YYSYMBOL_T_ELSE = 11,                    /* T_ELSE  */
+  YYSYMBOL_T_DO = 12,                      /* T_DO  */
+  YYSYMBOL_T_WHILE = 13,                   /* T_WHILE  */
+  YYSYMBOL_T_BREAK = 14,                   /* T_BREAK  */
+  YYSYMBOL_T_CONTINUE = 15,                /* T_CONTINUE  */
+  YYSYMBOL_T_RETURN = 16,                  /* T_RETURN  */
+  YYSYMBOL_T_LEFT_BRACE = 17,              /* T_LEFT_BRACE  */
+  YYSYMBOL_T_RIGHT_BRACE = 18,             /* T_RIGHT_BRACE  */
+  YYSYMBOL_T_SEMI = 19,                    /* T_SEMI  */
+  YYSYMBOL_T_COMMA = 20,                   /* T_COMMA  */
+  YYSYMBOL_T_EQUAL = 21,                   /* T_EQUAL  */
+  YYSYMBOL_T_PIPEPIPE = 22,                /* T_PIPEPIPE  */
+  YYSYMBOL_T_AMPAMP = 23,                  /* T_AMPAMP  */
+  YYSYMBOL_T_EQUALEQUAL = 24,              /* T_EQUALEQUAL  */
+  YYSYMBOL_T_EXCLAIMEQUAL = 25,            /* T_EXCLAIMEQUAL  */
+  YYSYMBOL_T_LESS = 26,                    /* T_LESS  */
+  YYSYMBOL_T_GREATER = 27,                 /* T_GREATER  */
+  YYSYMBOL_T_LESSEQUAL = 28,               /* T_LESSEQUAL  */
+  YYSYMBOL_T_GREATEREQUAL = 29,            /* T_GREATEREQUAL  */
+  YYSYMBOL_T_PLUS = 30,                    /* T_PLUS  */
+  YYSYMBOL_T_MINUS = 31,                   /* T_MINUS  */
+  YYSYMBOL_T_STAR = 32,                    /* T_STAR  */
+  YYSYMBOL_T_SLASH = 33,                   /* T_SLASH  */
+  YYSYMBOL_T_PERCENT = 34,                 /* T_PERCENT  */
+  YYSYMBOL_T_EXCLAIM = 35,                 /* T_EXCLAIM  */
+  YYSYMBOL_T_LEFT_SQUARE = 36,             /* T_LEFT_SQUARE  */
+  YYSYMBOL_T_RIGHT_SQUARE = 37,            /* T_RIGHT_SQUARE  */
+  YYSYMBOL_T_LEFT_PAREN = 38,              /* T_LEFT_PAREN  */
+  YYSYMBOL_T_RIGHT_PAREN = 39,             /* T_RIGHT_PAREN  */
+  YYSYMBOL_T_ELLIPSIS = 40,                /* T_ELLIPSIS  */
+  YYSYMBOL_T_IDENTIFIER = 41,              /* T_IDENTIFIER  */
+  YYSYMBOL_T_INTEGER_LITERAL = 42,         /* T_INTEGER_LITERAL  */
+  YYSYMBOL_T_FLOATING_LITERAL = 43,        /* T_FLOATING_LITERAL  */
+  YYSYMBOL_T_STRING_LITERAL = 44,          /* T_STRING_LITERAL  */
+  YYSYMBOL_T_CHAR_CONSTANT = 45,           /* T_CHAR_CONSTANT  */
+  YYSYMBOL_YYACCEPT = 46,                  /* $accept  */
+  YYSYMBOL_start = 47,                     /* start  */
+  YYSYMBOL_TranslationUnitDecl = 48,       /* TranslationUnitDecl  */
+  YYSYMBOL_TypedefDecl = 49                /* TypedefDecl  */
 };
 typedef enum yysymbol_kind_t yysymbol_kind_t;
 
@@ -531,21 +632,21 @@ union yyalloc
 #endif /* !YYCOPY_NEEDED */
 
 /* YYFINAL -- State number of the termination state.  */
-#define YYFINAL  7
+#define YYFINAL  6
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   12
+#define YYLAST   5
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  12
+#define YYNTOKENS  46
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  7
+#define YYNNTS  4
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  7
+#define YYNRULES  4
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  17
+#define YYNSTATES  10
 
 /* YYMAXUTOK -- Last valid token kind.  */
-#define YYMAXUTOK   266
+#define YYMAXUTOK   300
 
 
 /* YYTRANSLATE(TOKEN-NUM) -- Symbol number corresponding to TOKEN-NUM
@@ -585,14 +686,18 @@ static const yytype_int8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
-       5,     6,     7,     8,     9,    10,    11
+       5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
+      15,    16,    17,    18,    19,    20,    21,    22,    23,    24,
+      25,    26,    27,    28,    29,    30,    31,    32,    33,    34,
+      35,    36,    37,    38,    39,    40,    41,    42,    43,    44,
+      45
 };
 
 #if YYDEBUG
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,   116,   116,   121,   128,   133,   140,   147
+       0,   219,   219,   224,   231
 };
 #endif
 
@@ -608,10 +713,17 @@ static const char *yysymbol_name (yysymbol_kind_t yysymbol) YY_ATTRIBUTE_UNUSED;
    First, the terminals, then, starting at YYNTOKENS, nonterminals.  */
 static const char *const yytname[] =
 {
-  "\"end of file\"", "error", "\"invalid token\"", "T_NUMERIC_CONSTANT",
-  "T_IDENTIFIER", "T_INT", "T_RETURN", "T_SEMI", "T_L_PAREN", "T_R_PAREN",
-  "T_L_BRACE", "T_R_BRACE", "$accept", "Begin", "CompUnit", "GlobalDecl",
-  "FuncDef", "Block", "Stmt", YY_NULLPTR
+  "\"end of file\"", "error", "\"invalid token\"", "T_VOID", "T_CONST",
+  "T_CHAR", "T_LONG", "T_INT", "T_FLOAT", "T_DOUBLE", "T_IF", "T_ELSE",
+  "T_DO", "T_WHILE", "T_BREAK", "T_CONTINUE", "T_RETURN", "T_LEFT_BRACE",
+  "T_RIGHT_BRACE", "T_SEMI", "T_COMMA", "T_EQUAL", "T_PIPEPIPE",
+  "T_AMPAMP", "T_EQUALEQUAL", "T_EXCLAIMEQUAL", "T_LESS", "T_GREATER",
+  "T_LESSEQUAL", "T_GREATEREQUAL", "T_PLUS", "T_MINUS", "T_STAR",
+  "T_SLASH", "T_PERCENT", "T_EXCLAIM", "T_LEFT_SQUARE", "T_RIGHT_SQUARE",
+  "T_LEFT_PAREN", "T_RIGHT_PAREN", "T_ELLIPSIS", "T_IDENTIFIER",
+  "T_INTEGER_LITERAL", "T_FLOATING_LITERAL", "T_STRING_LITERAL",
+  "T_CHAR_CONSTANT", "$accept", "start", "TranslationUnitDecl",
+  "TypedefDecl", YY_NULLPTR
 };
 
 static const char *
@@ -627,11 +739,14 @@ yysymbol_name (yysymbol_kind_t yysymbol)
 static const yytype_int16 yytoknum[] =
 {
        0,   256,   257,   258,   259,   260,   261,   262,   263,   264,
-     265,   266
+     265,   266,   267,   268,   269,   270,   271,   272,   273,   274,
+     275,   276,   277,   278,   279,   280,   281,   282,   283,   284,
+     285,   286,   287,   288,   289,   290,   291,   292,   293,   294,
+     295,   296,   297,   298,   299,   300
 };
 #endif
 
-#define YYPACT_NINF (-7)
+#define YYPACT_NINF (-41)
 
 #define yypact_value_is_default(Yyn) \
   ((Yyn) == YYPACT_NINF)
@@ -645,8 +760,7 @@ static const yytype_int16 yytoknum[] =
      STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
-      -5,    -3,     2,    -7,    -7,    -7,    -4,    -7,    -6,    -2,
-      -1,    -7,     3,     0,     5,    -7,    -7
+      -7,   -40,     2,   -41,   -41,   -18,   -41,   -38,   -14,   -41
 };
 
   /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -654,20 +768,19 @@ static const yytype_int8 yypact[] =
      means the default is an error.  */
 static const yytype_int8 yydefact[] =
 {
-       0,     0,     0,     2,     3,     4,     0,     1,     0,     0,
-       0,     5,     0,     0,     0,     6,     7
+       0,     0,     0,     2,     3,     0,     1,     0,     0,     4
 };
 
   /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-      -7,    -7,    -7,    -7,    -7,    -7,    -7
+     -41,   -41,   -41,   -41
 };
 
   /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-       0,     2,     3,     4,     5,    11,    13
+       0,     2,     3,     4
 };
 
   /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -675,34 +788,31 @@ static const yytype_int8 yydefgoto[] =
      number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_int8 yytable[] =
 {
-       1,     6,     7,     9,     8,    12,    14,     0,    10,     0,
-       0,    15,    16
+       1,     5,     6,     7,     8,     9
 };
 
 static const yytype_int8 yycheck[] =
 {
-       5,     4,     0,     9,     8,     6,     3,    -1,    10,    -1,
-      -1,    11,     7
+       7,    41,     0,    21,    42,    19
 };
 
   /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
      symbol of state STATE-NUM.  */
 static const yytype_int8 yystos[] =
 {
-       0,     5,    13,    14,    15,    16,     4,     0,     8,     9,
-      10,    17,     6,    18,     3,    11,     7
+       0,     7,    47,    48,    49,    41,     0,    21,    42,    19
 };
 
   /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_int8 yyr1[] =
 {
-       0,    12,    13,    14,    15,    16,    17,    18
+       0,    46,    47,    48,    49
 };
 
   /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
 static const yytype_int8 yyr2[] =
 {
-       0,     2,     1,     1,     1,     5,     3,     3
+       0,     2,     1,     1,     5
 };
 
 
@@ -1169,65 +1279,37 @@ yyreduce:
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
-  case 2: /* Begin: CompUnit  */
-#line 116 "parser.y"
-                {
-    root = yyvsp[0];
+  case 2: /* start: TranslationUnitDecl  */
+#line 219 "/workspace/SYsU-lang/parser/build/parser.y"
+                           {
+    root = (yyvsp[0].decl);
   }
-#line 1178 "main.cc"
+#line 1288 "/workspace/SYsU-lang/parser/build/main.cc"
     break;
 
-  case 3: /* CompUnit: GlobalDecl  */
-#line 121 "parser.y"
-                     {
-    auto ptr = new Tree("TranslationUnitDecl");
-    ptr->addSon(yyvsp[0]);
-    yyval = ptr;
+  case 3: /* TranslationUnitDecl: TypedefDecl  */
+#line 224 "/workspace/SYsU-lang/parser/build/parser.y"
+                                 {
+    auto decl = gMgr.make<TranslationUnitDecl>()
+    decl->inner.push_back((yyvsp[0].decl));
+    (yyval.decl) = decl;
   }
-#line 1188 "main.cc"
+#line 1298 "/workspace/SYsU-lang/parser/build/main.cc"
     break;
 
-  case 4: /* GlobalDecl: FuncDef  */
-#line 128 "parser.y"
-                    {
-    yyval = yyvsp[0];
+  case 4: /* TypedefDecl: T_INT T_IDENTIFIER T_EQUAL T_INTEGER_LITERAL T_SEMI  */
+#line 231 "/workspace/SYsU-lang/parser/build/parser.y"
+                                                                {
+    auto decl = gMgr.make<TypedefDecl>()
+    decl->name = (yyvsp[-3].decl)->name;
+    decl->inner.push_back((yyvsp[-1].expr));
+    (yyval.decl) = decl;
   }
-#line 1196 "main.cc"
-    break;
-
-  case 5: /* FuncDef: T_INT T_IDENTIFIER T_L_PAREN T_R_PAREN Block  */
-#line 133 "parser.y"
-                                                     {
-    auto ptr = new Tree("FunctionDecl", yyvsp[-3]->name);
-    delete yyvsp[-3];
-    ptr->addSon(yyvsp[0]);
-    yyval = ptr;
-  }
-#line 1207 "main.cc"
-    break;
-
-  case 6: /* Block: T_L_BRACE Stmt T_R_BRACE  */
-#line 140 "parser.y"
-                                {
-    auto ptr = new Tree("CompoundStmt");
-    ptr->addSon(yyvsp[-1]);
-    yyval = ptr;
-  }
-#line 1217 "main.cc"
-    break;
-
-  case 7: /* Stmt: T_RETURN T_NUMERIC_CONSTANT T_SEMI  */
-#line 147 "parser.y"
-                                         {
-    auto ptr = new Tree("ReturnStmt");
-    ptr->addSon(yyvsp[-1]);
-    yyval = ptr;
-}
-#line 1227 "main.cc"
+#line 1309 "/workspace/SYsU-lang/parser/build/main.cc"
     break;
 
 
-#line 1231 "main.cc"
+#line 1313 "/workspace/SYsU-lang/parser/build/main.cc"
 
       default: break;
     }
@@ -1421,4 +1503,4 @@ yyreturn:
   return yyresult;
 }
 
-#line 153 "parser.y"
+#line 239 "/workspace/SYsU-lang/parser/build/parser.y"

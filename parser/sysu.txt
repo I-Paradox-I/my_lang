@@ -1,1 +1,0 @@
-{"inner":[{"kind":"VarDecl","name":"a"},{"inner":[{"inner":[{"inner":[{"kind":"IntegerLiteral","value":"0"}],"kind":"ReturnStmt"}],"kind":"CompoundStmt"}],"kind":"FunctionDecl","name":"main"}],"kind":"TranslationUnitDecl"}
