@@ -5,6 +5,10 @@ name: docker
 # separate terms of service, privacy policy, and support
 # documentation.
 
+#停用
+disabled: true
+# xuhao 20337256 不需要在github上构建workflow
+
 on:
   push:
     branches: [latest, unstable-slim]
