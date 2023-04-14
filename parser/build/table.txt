@@ -138,7 +138,7 @@ Stmt ::= ...
 CompUnit    ::= [CompUnit] FuncDef;
 
 FuncDef     ::= FuncType IDENT "(" [FuncFParams] ")" Block;
-FuncType    ::= "void" | "int";
+FuncType    ::= "void" | "int"TranslationUnitDecl;
 FuncFParams ::= FuncFParam {"," FuncFParam};
 FuncFParam  ::= BType IDENT;
 

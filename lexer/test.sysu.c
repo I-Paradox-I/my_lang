@@ -1,1 +1,1 @@
-char a = 'a';
+char a = '\n';

@@ -11,5 +11,5 @@ test_file_path=${1:-'/workspace/SYsU-lang/parser/debug/test.sysu.c'}
 #   clang -cc1 -ast-dump &>  /workspace/SYsU-lang/parser/debug/ori_tree.txt   
   ) 
 
-  python compare.py
+  python compare_clang2.py
 

@@ -1,11 +1,72 @@
 kind: TranslationUnitDecl
 inner:
 - kind: FunctionDecl
-  name: main
+  type:
+    qualType: int ()
+  name: test
   inner:
   - kind: CompoundStmt
     inner:
+    - kind: DeclStmt
+      inner:
+      - kind: VarDecl
+        type:
+          qualType: int
+        name: a
+    - kind: IfStmt
+      inner:
+      - kind: BinaryOperator
+        inner:
+        - kind: IntegerLiteral
+          type:
+            qualType: int
+          value: '1'
+        - kind: IntegerLiteral
+          type:
+            qualType: int
+          value: '2'
+      - kind: CompoundStmt
+        inner:
+        - kind: ReturnStmt
+          inner:
+          - kind: IntegerLiteral
+            type:
+              qualType: int
+            value: '1'
+      - kind: CompoundStmt
+        inner:
+        - kind: ReturnStmt
+          inner:
+          - kind: IntegerLiteral
+            type:
+              qualType: int
+            value: '2'
+    - kind: DoStmt
+      inner:
+      - kind: CompoundStmt
+        inner:
+        - kind: ReturnStmt
+          inner:
+          - kind: IntegerLiteral
+            type:
+              qualType: int
+            value: '1'
+      - kind: IntegerLiteral
+        type:
+          qualType: int
+        value: '1'
+    - kind: WhileStmt
+      inner:
+      - kind: IntegerLiteral
+        type:
+          qualType: int
+        value: '2'
+      - kind: CompoundStmt
+        inner:
+        - kind: BreakStmt
     - kind: ReturnStmt
       inner:
       - kind: IntegerLiteral
-        value: '3'
+        type:
+          qualType: int
+        value: '0'

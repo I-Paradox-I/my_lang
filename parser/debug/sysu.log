@@ -1,0 +1,748 @@
+Starting parse
+Entering state 0
+Stack now 0
+Reading a token
+Next token is token T_INT ()
+Reducing stack by rule 28 (line 518):
+-> $$ = nterm typemodifier ()
+Entering state 11
+Stack now 0 11
+Next token is token T_INT ()
+Shifting token T_INT ()
+Entering state 24
+Stack now 0 11 24
+Reducing stack by rule 31 (line 537):
+   $1 = token T_INT ()
+-> $$ = nterm simpletypespecifier ()
+Entering state 27
+Stack now 0 11 27
+Reducing stack by rule 27 (line 510):
+   $1 = nterm typemodifier ()
+   $2 = nterm simpletypespecifier ()
+-> $$ = nterm typespecifier ()
+Entering state 10
+Stack now 0 10
+Reading a token
+Next token is token T_IDENTIFIER ()
+Shifting token T_IDENTIFIER ()
+Entering state 16
+Stack now 0 10 16
+Reading a token
+Next token is token T_LEFT_PAREN ()
+Shifting token T_LEFT_PAREN ()
+Entering state 30
+Stack now 0 10 16 30
+Reading a token
+Next token is token T_RIGHT_PAREN ()
+Reducing stack by rule 22 (line 472):
+-> $$ = nterm paramslist ()
+Entering state 36
+Stack now 0 10 16 30 36
+Next token is token T_RIGHT_PAREN ()
+Shifting token T_RIGHT_PAREN ()
+Entering state 57
+Stack now 0 10 16 30 36 57
+Reading a token
+Next token is token T_LEFT_BRACE ()
+Shifting token T_LEFT_BRACE ()
+Entering state 78
+Stack now 0 10 16 30 36 57 78
+Reading a token
+Next token is token T_INT ()
+Reducing stack by rule 28 (line 518):
+-> $$ = nterm typemodifier ()
+Entering state 11
+Stack now 0 10 16 30 36 57 78 11
+Next token is token T_INT ()
+Shifting token T_INT ()
+Entering state 24
+Stack now 0 10 16 30 36 57 78 11 24
+Reducing stack by rule 31 (line 537):
+   $1 = token T_INT ()
+-> $$ = nterm simpletypespecifier ()
+Entering state 27
+Stack now 0 10 16 30 36 57 78 11 27
+Reducing stack by rule 27 (line 510):
+   $1 = nterm typemodifier ()
+   $2 = nterm simpletypespecifier ()
+-> $$ = nterm typespecifier ()
+Entering state 105
+Stack now 0 10 16 30 36 57 78 105
+Reading a token
+Next token is token T_IDENTIFIER ()
+Shifting token T_IDENTIFIER ()
+Entering state 28
+Stack now 0 10 16 30 36 57 78 105 28
+Reducing stack by rule 18 (line 425):
+   $1 = token T_IDENTIFIER ()
+-> $$ = nterm ptruninitdeclarator ()
+Entering state 20
+Stack now 0 10 16 30 36 57 78 105 20
+Reading a token
+Next token is token T_SEMI ()
+Reducing stack by rule 14 (line 400):
+   $1 = nterm ptruninitdeclarator ()
+-> $$ = nterm uninitdeclarator ()
+Entering state 19
+Stack now 0 10 16 30 36 57 78 105 19
+Next token is token T_SEMI ()
+Reducing stack by rule 12 (line 381):
+   $1 = nterm uninitdeclarator ()
+-> $$ = nterm declarator ()
+Entering state 18
+Stack now 0 10 16 30 36 57 78 105 18
+Next token is token T_SEMI ()
+Reducing stack by rule 10 (line 366):
+   $1 = nterm declarator ()
+-> $$ = nterm declaratorlist ()
+Entering state 17
+Stack now 0 10 16 30 36 57 78 105 17
+Next token is token T_SEMI ()
+Shifting token T_SEMI ()
+Entering state 31
+Stack now 0 10 16 30 36 57 78 105 17 31
+Reducing stack by rule 9 (line 350):
+   $1 = nterm typespecifier ()
+   $2 = nterm declaratorlist ()
+   $3 = token T_SEMI ()
+-> $$ = nterm vardeclseq ()
+Entering state 104
+Stack now 0 10 16 30 36 57 78 104
+Reducing stack by rule 78 (line 798):
+   $1 = nterm vardeclseq ()
+-> $$ = nterm declstmt ()
+Entering state 110
+Stack now 0 10 16 30 36 57 78 110
+Reducing stack by rule 66 (line 754):
+   $1 = nterm declstmt ()
+-> $$ = nterm stmt ()
+Entering state 106
+Stack now 0 10 16 30 36 57 78 106
+Reading a token
+Next token is token T_IF ()
+Shifting token T_IF ()
+Entering state 97
+Stack now 0 10 16 30 36 57 78 106 97
+Reading a token
+Next token is token T_LEFT_PAREN ()
+Shifting token T_LEFT_PAREN ()
+Entering state 118
+Stack now 0 10 16 30 36 57 78 106 97 118
+Reading a token
+Next token is token T_INTEGER_LITERAL ()
+Shifting token T_INTEGER_LITERAL ()
+Entering state 45
+Stack now 0 10 16 30 36 57 78 106 97 118 45
+Reducing stack by rule 38 (line 578):
+   $1 = token T_INTEGER_LITERAL ()
+-> $$ = nterm numexpr ()
+Entering state 127
+Stack now 0 10 16 30 36 57 78 106 97 118 127
+Reading a token
+Next token is token T_EQUALEQUAL ()
+Shifting token T_EQUALEQUAL ()
+Entering state 69
+Stack now 0 10 16 30 36 57 78 106 97 118 127 69
+Reading a token
+Next token is token T_INTEGER_LITERAL ()
+Shifting token T_INTEGER_LITERAL ()
+Entering state 45
+Stack now 0 10 16 30 36 57 78 106 97 118 127 69 45
+Reducing stack by rule 38 (line 578):
+   $1 = token T_INTEGER_LITERAL ()
+-> $$ = nterm numexpr ()
+Entering state 88
+Stack now 0 10 16 30 36 57 78 106 97 118 127 69 88
+Reading a token
+Next token is token T_RIGHT_PAREN ()
+Reducing stack by rule 57 (line 681):
+   $1 = nterm numexpr ()
+   $2 = token T_EQUALEQUAL ()
+   $3 = nterm numexpr ()
+-> $$ = nterm binaryoperator ()
+Entering state 53
+Stack now 0 10 16 30 36 57 78 106 97 118 53
+Reducing stack by rule 40 (line 580):
+   $1 = nterm binaryoperator ()
+-> $$ = nterm numexpr ()
+Entering state 127
+Stack now 0 10 16 30 36 57 78 106 97 118 127
+Next token is token T_RIGHT_PAREN ()
+Shifting token T_RIGHT_PAREN ()
+Entering state 132
+Stack now 0 10 16 30 36 57 78 106 97 118 127 132
+Reducing stack by rule 64 (line 744):
+   $1 = token T_LEFT_PAREN ()
+   $2 = nterm numexpr ()
+   $3 = token T_RIGHT_PAREN ()
+-> $$ = nterm condition ()
+Entering state 119
+Stack now 0 10 16 30 36 57 78 106 97 119
+Reading a token
+Next token is token T_LEFT_BRACE ()
+Shifting token T_LEFT_BRACE ()
+Entering state 78
+Stack now 0 10 16 30 36 57 78 106 97 119 78
+Reading a token
+Next token is token T_RETURN ()
+Shifting token T_RETURN ()
+Entering state 102
+Stack now 0 10 16 30 36 57 78 106 97 119 78 102
+Reading a token
+Next token is token T_INTEGER_LITERAL ()
+Shifting token T_INTEGER_LITERAL ()
+Entering state 45
+Stack now 0 10 16 30 36 57 78 106 97 119 78 102 45
+Reducing stack by rule 38 (line 578):
+   $1 = token T_INTEGER_LITERAL ()
+-> $$ = nterm numexpr ()
+Entering state 50
+Stack now 0 10 16 30 36 57 78 106 97 119 78 102 50
+Reading a token
+Next token is token T_SEMI ()
+Reducing stack by rule 43 (line 586):
+   $1 = nterm numexpr ()
+-> $$ = nterm literalexpr ()
+Entering state 51
+Stack now 0 10 16 30 36 57 78 106 97 119 78 102 51
+Reducing stack by rule 36 (line 572):
+   $1 = nterm literalexpr ()
+-> $$ = nterm primaryexpr ()
+Entering state 124
+Stack now 0 10 16 30 36 57 78 106 97 119 78 102 124
+Next token is token T_SEMI ()
+Shifting token T_SEMI ()
+Entering state 131
+Stack now 0 10 16 30 36 57 78 106 97 119 78 102 124 131
+Reducing stack by rule 79 (line 810):
+   $1 = token T_RETURN ()
+   $2 = nterm primaryexpr ()
+   $3 = token T_SEMI ()
+-> $$ = nterm returnstmt ()
+Entering state 111
+Stack now 0 10 16 30 36 57 78 106 97 119 78 111
+Reducing stack by rule 72 (line 760):
+   $1 = nterm returnstmt ()
+-> $$ = nterm stmt ()
+Entering state 106
+Stack now 0 10 16 30 36 57 78 106 97 119 78 106
+Reading a token
+Next token is token T_RIGHT_BRACE ()
+Reducing stack by rule 75 (line 777):
+-> $$ = nterm stmtseq ()
+Entering state 125
+Stack now 0 10 16 30 36 57 78 106 97 119 78 106 125
+Reducing stack by rule 76 (line 781):
+   $1 = nterm stmt ()
+   $2 = nterm stmtseq ()
+-> $$ = nterm stmtseq ()
+Entering state 108
+Stack now 0 10 16 30 36 57 78 106 97 119 78 108
+Next token is token T_RIGHT_BRACE ()
+Shifting token T_RIGHT_BRACE ()
+Entering state 126
+Stack now 0 10 16 30 36 57 78 106 97 119 78 108 126
+Reducing stack by rule 74 (line 765):
+   $1 = token T_LEFT_BRACE ()
+   $2 = nterm stmtseq ()
+   $3 = token T_RIGHT_BRACE ()
+-> $$ = nterm compoundstmt ()
+Entering state 107
+Stack now 0 10 16 30 36 57 78 106 97 119 107
+Reducing stack by rule 65 (line 753):
+   $1 = nterm compoundstmt ()
+-> $$ = nterm stmt ()
+Entering state 128
+Stack now 0 10 16 30 36 57 78 106 97 119 128
+Reading a token
+Next token is token T_ELSE ()
+Shifting token T_ELSE ()
+Entering state 133
+Stack now 0 10 16 30 36 57 78 106 97 119 128 133
+Reading a token
+Next token is token T_LEFT_BRACE ()
+Shifting token T_LEFT_BRACE ()
+Entering state 78
+Stack now 0 10 16 30 36 57 78 106 97 119 128 133 78
+Reading a token
+Next token is token T_RETURN ()
+Shifting token T_RETURN ()
+Entering state 102
+Stack now 0 10 16 30 36 57 78 106 97 119 128 133 78 102
+Reading a token
+Next token is token T_INTEGER_LITERAL ()
+Shifting token T_INTEGER_LITERAL ()
+Entering state 45
+Stack now 0 10 16 30 36 57 78 106 97 119 128 133 78 102 45
+Reducing stack by rule 38 (line 578):
+   $1 = token T_INTEGER_LITERAL ()
+-> $$ = nterm numexpr ()
+Entering state 50
+Stack now 0 10 16 30 36 57 78 106 97 119 128 133 78 102 50
+Reading a token
+Next token is token T_SEMI ()
+Reducing stack by rule 43 (line 586):
+   $1 = nterm numexpr ()
+-> $$ = nterm literalexpr ()
+Entering state 51
+Stack now 0 10 16 30 36 57 78 106 97 119 128 133 78 102 51
+Reducing stack by rule 36 (line 572):
+   $1 = nterm literalexpr ()
+-> $$ = nterm primaryexpr ()
+Entering state 124
+Stack now 0 10 16 30 36 57 78 106 97 119 128 133 78 102 124
+Next token is token T_SEMI ()
+Shifting token T_SEMI ()
+Entering state 131
+Stack now 0 10 16 30 36 57 78 106 97 119 128 133 78 102 124 131
+Reducing stack by rule 79 (line 810):
+   $1 = token T_RETURN ()
+   $2 = nterm primaryexpr ()
+   $3 = token T_SEMI ()
+-> $$ = nterm returnstmt ()
+Entering state 111
+Stack now 0 10 16 30 36 57 78 106 97 119 128 133 78 111
+Reducing stack by rule 72 (line 760):
+   $1 = nterm returnstmt ()
+-> $$ = nterm stmt ()
+Entering state 106
+Stack now 0 10 16 30 36 57 78 106 97 119 128 133 78 106
+Reading a token
+Next token is token T_RIGHT_BRACE ()
+Reducing stack by rule 75 (line 777):
+-> $$ = nterm stmtseq ()
+Entering state 125
+Stack now 0 10 16 30 36 57 78 106 97 119 128 133 78 106 125
+Reducing stack by rule 76 (line 781):
+   $1 = nterm stmt ()
+   $2 = nterm stmtseq ()
+-> $$ = nterm stmtseq ()
+Entering state 108
+Stack now 0 10 16 30 36 57 78 106 97 119 128 133 78 108
+Next token is token T_RIGHT_BRACE ()
+Shifting token T_RIGHT_BRACE ()
+Entering state 126
+Stack now 0 10 16 30 36 57 78 106 97 119 128 133 78 108 126
+Reducing stack by rule 74 (line 765):
+   $1 = token T_LEFT_BRACE ()
+   $2 = nterm stmtseq ()
+   $3 = token T_RIGHT_BRACE ()
+-> $$ = nterm compoundstmt ()
+Entering state 107
+Stack now 0 10 16 30 36 57 78 106 97 119 128 133 107
+Reducing stack by rule 65 (line 753):
+   $1 = nterm compoundstmt ()
+-> $$ = nterm stmt ()
+Entering state 135
+Stack now 0 10 16 30 36 57 78 106 97 119 128 133 135
+Reducing stack by rule 81 (line 826):
+   $1 = token T_IF ()
+   $2 = nterm condition ()
+   $3 = nterm stmt ()
+   $4 = token T_ELSE ()
+   $5 = nterm stmt ()
+-> $$ = nterm ifstmt ()
+Entering state 112
+Stack now 0 10 16 30 36 57 78 106 112
+Reducing stack by rule 67 (line 755):
+   $1 = nterm ifstmt ()
+-> $$ = nterm stmt ()
+Entering state 106
+Stack now 0 10 16 30 36 57 78 106 106
+Reading a token
+Next token is token T_DO ()
+Shifting token T_DO ()
+Entering state 98
+Stack now 0 10 16 30 36 57 78 106 106 98
+Reading a token
+Next token is token T_LEFT_BRACE ()
+Shifting token T_LEFT_BRACE ()
+Entering state 78
+Stack now 0 10 16 30 36 57 78 106 106 98 78
+Reading a token
+Next token is token T_RETURN ()
+Shifting token T_RETURN ()
+Entering state 102
+Stack now 0 10 16 30 36 57 78 106 106 98 78 102
+Reading a token
+Next token is token T_INTEGER_LITERAL ()
+Shifting token T_INTEGER_LITERAL ()
+Entering state 45
+Stack now 0 10 16 30 36 57 78 106 106 98 78 102 45
+Reducing stack by rule 38 (line 578):
+   $1 = token T_INTEGER_LITERAL ()
+-> $$ = nterm numexpr ()
+Entering state 50
+Stack now 0 10 16 30 36 57 78 106 106 98 78 102 50
+Reading a token
+Next token is token T_SEMI ()
+Reducing stack by rule 43 (line 586):
+   $1 = nterm numexpr ()
+-> $$ = nterm literalexpr ()
+Entering state 51
+Stack now 0 10 16 30 36 57 78 106 106 98 78 102 51
+Reducing stack by rule 36 (line 572):
+   $1 = nterm literalexpr ()
+-> $$ = nterm primaryexpr ()
+Entering state 124
+Stack now 0 10 16 30 36 57 78 106 106 98 78 102 124
+Next token is token T_SEMI ()
+Shifting token T_SEMI ()
+Entering state 131
+Stack now 0 10 16 30 36 57 78 106 106 98 78 102 124 131
+Reducing stack by rule 79 (line 810):
+   $1 = token T_RETURN ()
+   $2 = nterm primaryexpr ()
+   $3 = token T_SEMI ()
+-> $$ = nterm returnstmt ()
+Entering state 111
+Stack now 0 10 16 30 36 57 78 106 106 98 78 111
+Reducing stack by rule 72 (line 760):
+   $1 = nterm returnstmt ()
+-> $$ = nterm stmt ()
+Entering state 106
+Stack now 0 10 16 30 36 57 78 106 106 98 78 106
+Reading a token
+Next token is token T_RIGHT_BRACE ()
+Reducing stack by rule 75 (line 777):
+-> $$ = nterm stmtseq ()
+Entering state 125
+Stack now 0 10 16 30 36 57 78 106 106 98 78 106 125
+Reducing stack by rule 76 (line 781):
+   $1 = nterm stmt ()
+   $2 = nterm stmtseq ()
+-> $$ = nterm stmtseq ()
+Entering state 108
+Stack now 0 10 16 30 36 57 78 106 106 98 78 108
+Next token is token T_RIGHT_BRACE ()
+Shifting token T_RIGHT_BRACE ()
+Entering state 126
+Stack now 0 10 16 30 36 57 78 106 106 98 78 108 126
+Reducing stack by rule 74 (line 765):
+   $1 = token T_LEFT_BRACE ()
+   $2 = nterm stmtseq ()
+   $3 = token T_RIGHT_BRACE ()
+-> $$ = nterm compoundstmt ()
+Entering state 107
+Stack now 0 10 16 30 36 57 78 106 106 98 107
+Reducing stack by rule 65 (line 753):
+   $1 = nterm compoundstmt ()
+-> $$ = nterm stmt ()
+Entering state 120
+Stack now 0 10 16 30 36 57 78 106 106 98 120
+Reading a token
+Next token is token T_WHILE ()
+Shifting token T_WHILE ()
+Entering state 129
+Stack now 0 10 16 30 36 57 78 106 106 98 120 129
+Reading a token
+Next token is token T_LEFT_PAREN ()
+Shifting token T_LEFT_PAREN ()
+Entering state 118
+Stack now 0 10 16 30 36 57 78 106 106 98 120 129 118
+Reading a token
+Next token is token T_INTEGER_LITERAL ()
+Shifting token T_INTEGER_LITERAL ()
+Entering state 45
+Stack now 0 10 16 30 36 57 78 106 106 98 120 129 118 45
+Reducing stack by rule 38 (line 578):
+   $1 = token T_INTEGER_LITERAL ()
+-> $$ = nterm numexpr ()
+Entering state 127
+Stack now 0 10 16 30 36 57 78 106 106 98 120 129 118 127
+Reading a token
+Next token is token T_RIGHT_PAREN ()
+Shifting token T_RIGHT_PAREN ()
+Entering state 132
+Stack now 0 10 16 30 36 57 78 106 106 98 120 129 118 127 132
+Reducing stack by rule 64 (line 744):
+   $1 = token T_LEFT_PAREN ()
+   $2 = nterm numexpr ()
+   $3 = token T_RIGHT_PAREN ()
+-> $$ = nterm condition ()
+Entering state 134
+Stack now 0 10 16 30 36 57 78 106 106 98 120 129 134
+Reading a token
+Next token is token T_SEMI ()
+Shifting token T_SEMI ()
+Entering state 136
+Stack now 0 10 16 30 36 57 78 106 106 98 120 129 134 136
+Reducing stack by rule 82 (line 837):
+   $1 = token T_DO ()
+   $2 = nterm stmt ()
+   $3 = token T_WHILE ()
+   $4 = nterm condition ()
+   $5 = token T_SEMI ()
+-> $$ = nterm dostmt ()
+Entering state 113
+Stack now 0 10 16 30 36 57 78 106 106 113
+Reducing stack by rule 68 (line 756):
+   $1 = nterm dostmt ()
+-> $$ = nterm stmt ()
+Entering state 106
+Stack now 0 10 16 30 36 57 78 106 106 106
+Reading a token
+Next token is token T_WHILE ()
+Shifting token T_WHILE ()
+Entering state 99
+Stack now 0 10 16 30 36 57 78 106 106 106 99
+Reading a token
+Next token is token T_LEFT_PAREN ()
+Shifting token T_LEFT_PAREN ()
+Entering state 118
+Stack now 0 10 16 30 36 57 78 106 106 106 99 118
+Reading a token
+Next token is token T_INTEGER_LITERAL ()
+Shifting token T_INTEGER_LITERAL ()
+Entering state 45
+Stack now 0 10 16 30 36 57 78 106 106 106 99 118 45
+Reducing stack by rule 38 (line 578):
+   $1 = token T_INTEGER_LITERAL ()
+-> $$ = nterm numexpr ()
+Entering state 127
+Stack now 0 10 16 30 36 57 78 106 106 106 99 118 127
+Reading a token
+Next token is token T_RIGHT_PAREN ()
+Shifting token T_RIGHT_PAREN ()
+Entering state 132
+Stack now 0 10 16 30 36 57 78 106 106 106 99 118 127 132
+Reducing stack by rule 64 (line 744):
+   $1 = token T_LEFT_PAREN ()
+   $2 = nterm numexpr ()
+   $3 = token T_RIGHT_PAREN ()
+-> $$ = nterm condition ()
+Entering state 121
+Stack now 0 10 16 30 36 57 78 106 106 106 99 121
+Reading a token
+Next token is token T_LEFT_BRACE ()
+Shifting token T_LEFT_BRACE ()
+Entering state 78
+Stack now 0 10 16 30 36 57 78 106 106 106 99 121 78
+Reading a token
+Next token is token T_BREAK ()
+Shifting token T_BREAK ()
+Entering state 100
+Stack now 0 10 16 30 36 57 78 106 106 106 99 121 78 100
+Reading a token
+Next token is token T_SEMI ()
+Shifting token T_SEMI ()
+Entering state 122
+Stack now 0 10 16 30 36 57 78 106 106 106 99 121 78 100 122
+Reducing stack by rule 84 (line 857):
+   $1 = token T_BREAK ()
+   $2 = token T_SEMI ()
+-> $$ = nterm breakstmt ()
+Entering state 115
+Stack now 0 10 16 30 36 57 78 106 106 106 99 121 78 115
+Reducing stack by rule 70 (line 758):
+   $1 = nterm breakstmt ()
+-> $$ = nterm stmt ()
+Entering state 106
+Stack now 0 10 16 30 36 57 78 106 106 106 99 121 78 106
+Reading a token
+Next token is token T_CONTINUE ()
+Shifting token T_CONTINUE ()
+Entering state 101
+Stack now 0 10 16 30 36 57 78 106 106 106 99 121 78 106 101
+Reading a token
+Next token is token T_SEMI ()
+Shifting token T_SEMI ()
+Entering state 123
+Stack now 0 10 16 30 36 57 78 106 106 106 99 121 78 106 101 123
+Reducing stack by rule 85 (line 865):
+   $1 = token T_CONTINUE ()
+   $2 = token T_SEMI ()
+-> $$ = nterm continuestmt ()
+Entering state 116
+Stack now 0 10 16 30 36 57 78 106 106 106 99 121 78 106 116
+Reducing stack by rule 71 (line 759):
+   $1 = nterm continuestmt ()
+-> $$ = nterm stmt ()
+Entering state 106
+Stack now 0 10 16 30 36 57 78 106 106 106 99 121 78 106 106
+Reading a token
+Next token is token T_RIGHT_BRACE ()
+Reducing stack by rule 75 (line 777):
+-> $$ = nterm stmtseq ()
+Entering state 125
+Stack now 0 10 16 30 36 57 78 106 106 106 99 121 78 106 106 125
+Reducing stack by rule 76 (line 781):
+   $1 = nterm stmt ()
+   $2 = nterm stmtseq ()
+-> $$ = nterm stmtseq ()
+Entering state 125
+Stack now 0 10 16 30 36 57 78 106 106 106 99 121 78 106 125
+Reducing stack by rule 76 (line 781):
+   $1 = nterm stmt ()
+   $2 = nterm stmtseq ()
+-> $$ = nterm stmtseq ()
+Entering state 108
+Stack now 0 10 16 30 36 57 78 106 106 106 99 121 78 108
+Next token is token T_RIGHT_BRACE ()
+Shifting token T_RIGHT_BRACE ()
+Entering state 126
+Stack now 0 10 16 30 36 57 78 106 106 106 99 121 78 108 126
+Reducing stack by rule 74 (line 765):
+   $1 = token T_LEFT_BRACE ()
+   $2 = nterm stmtseq ()
+   $3 = token T_RIGHT_BRACE ()
+-> $$ = nterm compoundstmt ()
+Entering state 107
+Stack now 0 10 16 30 36 57 78 106 106 106 99 121 107
+Reducing stack by rule 65 (line 753):
+   $1 = nterm compoundstmt ()
+-> $$ = nterm stmt ()
+Entering state 130
+Stack now 0 10 16 30 36 57 78 106 106 106 99 121 130
+Reducing stack by rule 83 (line 847):
+   $1 = token T_WHILE ()
+   $2 = nterm condition ()
+   $3 = nterm stmt ()
+-> $$ = nterm whilestmt ()
+Entering state 114
+Stack now 0 10 16 30 36 57 78 106 106 106 114
+Reducing stack by rule 69 (line 757):
+   $1 = nterm whilestmt ()
+-> $$ = nterm stmt ()
+Entering state 106
+Stack now 0 10 16 30 36 57 78 106 106 106 106
+Reading a token
+Next token is token T_RETURN ()
+Shifting token T_RETURN ()
+Entering state 102
+Stack now 0 10 16 30 36 57 78 106 106 106 106 102
+Reading a token
+Next token is token T_INTEGER_LITERAL ()
+Shifting token T_INTEGER_LITERAL ()
+Entering state 45
+Stack now 0 10 16 30 36 57 78 106 106 106 106 102 45
+Reducing stack by rule 38 (line 578):
+   $1 = token T_INTEGER_LITERAL ()
+-> $$ = nterm numexpr ()
+Entering state 50
+Stack now 0 10 16 30 36 57 78 106 106 106 106 102 50
+Reading a token
+Next token is token T_SEMI ()
+Reducing stack by rule 43 (line 586):
+   $1 = nterm numexpr ()
+-> $$ = nterm literalexpr ()
+Entering state 51
+Stack now 0 10 16 30 36 57 78 106 106 106 106 102 51
+Reducing stack by rule 36 (line 572):
+   $1 = nterm literalexpr ()
+-> $$ = nterm primaryexpr ()
+Entering state 124
+Stack now 0 10 16 30 36 57 78 106 106 106 106 102 124
+Next token is token T_SEMI ()
+Shifting token T_SEMI ()
+Entering state 131
+Stack now 0 10 16 30 36 57 78 106 106 106 106 102 124 131
+Reducing stack by rule 79 (line 810):
+   $1 = token T_RETURN ()
+   $2 = nterm primaryexpr ()
+   $3 = token T_SEMI ()
+-> $$ = nterm returnstmt ()
+Entering state 111
+Stack now 0 10 16 30 36 57 78 106 106 106 106 111
+Reducing stack by rule 72 (line 760):
+   $1 = nterm returnstmt ()
+-> $$ = nterm stmt ()
+Entering state 106
+Stack now 0 10 16 30 36 57 78 106 106 106 106 106
+Reading a token
+Next token is token T_RIGHT_BRACE ()
+Reducing stack by rule 75 (line 777):
+-> $$ = nterm stmtseq ()
+Entering state 125
+Stack now 0 10 16 30 36 57 78 106 106 106 106 106 125
+Reducing stack by rule 76 (line 781):
+   $1 = nterm stmt ()
+   $2 = nterm stmtseq ()
+-> $$ = nterm stmtseq ()
+Entering state 125
+Stack now 0 10 16 30 36 57 78 106 106 106 106 125
+Reducing stack by rule 76 (line 781):
+   $1 = nterm stmt ()
+   $2 = nterm stmtseq ()
+-> $$ = nterm stmtseq ()
+Entering state 125
+Stack now 0 10 16 30 36 57 78 106 106 106 125
+Reducing stack by rule 76 (line 781):
+   $1 = nterm stmt ()
+   $2 = nterm stmtseq ()
+-> $$ = nterm stmtseq ()
+Entering state 125
+Stack now 0 10 16 30 36 57 78 106 106 125
+Reducing stack by rule 76 (line 781):
+   $1 = nterm stmt ()
+   $2 = nterm stmtseq ()
+-> $$ = nterm stmtseq ()
+Entering state 125
+Stack now 0 10 16 30 36 57 78 106 125
+Reducing stack by rule 76 (line 781):
+   $1 = nterm stmt ()
+   $2 = nterm stmtseq ()
+-> $$ = nterm stmtseq ()
+Entering state 108
+Stack now 0 10 16 30 36 57 78 108
+Next token is token T_RIGHT_BRACE ()
+Shifting token T_RIGHT_BRACE ()
+Entering state 126
+Stack now 0 10 16 30 36 57 78 108 126
+Reducing stack by rule 74 (line 765):
+   $1 = token T_LEFT_BRACE ()
+   $2 = nterm stmtseq ()
+   $3 = token T_RIGHT_BRACE ()
+-> $$ = nterm compoundstmt ()
+Entering state 80
+Stack now 0 10 16 30 36 57 80
+Reducing stack by rule 21 (line 451):
+   $1 = nterm typespecifier ()
+   $2 = token T_IDENTIFIER ()
+   $3 = token T_LEFT_PAREN ()
+   $4 = nterm paramslist ()
+   $5 = token T_RIGHT_PAREN ()
+   $6 = nterm compoundstmt ()
+-> $$ = nterm functiondecl ()
+Entering state 9
+Stack now 0 9
+Reducing stack by rule 7 (line 337):
+   $1 = nterm functiondecl ()
+-> $$ = nterm declaration ()
+Entering state 6
+Stack now 0 6
+Reading a token
+Next token is token T_EOF ()
+Reducing stack by rule 4 (line 328):
+-> $$ = nterm declarationseq ()
+Entering state 14
+Stack now 0 6 14
+Reducing stack by rule 3 (line 313):
+   $1 = nterm declaration ()
+   $2 = nterm declarationseq ()
+-> $$ = nterm declarationseq ()
+Entering state 5
+Stack now 0 5
+Next token is token T_EOF ()
+Shifting token T_EOF ()
+Entering state 13
+Stack now 0 5 13
+Reducing stack by rule 2 (line 301):
+   $1 = nterm declarationseq ()
+   $2 = token T_EOF ()
+-> $$ = nterm translationunitdecl ()
+Entering state 4
+Stack now 0 4
+Reducing stack by rule 1 (line 295):
+   $1 = nterm translationunitdecl ()
+-> $$ = nterm start ()
+Entering state 3
+Stack now 0 3
+Reading a token
+Now at end of input.
+Shifting token "end of file" ()
+Entering state 12
+Stack now 0 3 12
+Stack now 0 3 12
+Cleanup: popping token "end of file" ()
+Cleanup: popping nterm start ()

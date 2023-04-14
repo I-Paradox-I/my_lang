@@ -1,0 +1,29 @@
+TranslationUnitDecl 0x1d165a8 <<invalid sloc>> <invalid sloc>
+|-TypedefDecl 0x1d16e68 <<invalid sloc>> <invalid sloc> implicit __int128_t '__int128'
+| `-BuiltinType 0x1d16b40 '__int128'
+|-TypedefDecl 0x1d16ed8 <<invalid sloc>> <invalid sloc> implicit __uint128_t 'unsigned __int128'
+| `-BuiltinType 0x1d16b60 'unsigned __int128'
+|-TypedefDecl 0x1d171e0 <<invalid sloc>> <invalid sloc> implicit __NSConstantString 'struct __NSConstantString_tag'
+| `-RecordType 0x1d16fb0 'struct __NSConstantString_tag'
+|   `-Record 0x1d16f30 '__NSConstantString_tag'
+|-TypedefDecl 0x1d17288 <<invalid sloc>> <invalid sloc> implicit __builtin_ms_va_list 'char *'
+| `-PointerType 0x1d17240 'char *'
+|   `-BuiltinType 0x1d16640 'char'
+|-TypedefDecl 0x1d55cd0 <<invalid sloc>> <invalid sloc> implicit __builtin_va_list 'struct __va_list_tag [1]'
+| `-ConstantArrayType 0x1d17520 'struct __va_list_tag [1]' 1 
+|   `-RecordType 0x1d17360 'struct __va_list_tag'
+|     `-Record 0x1d172e0 '__va_list_tag'
+`-FunctionDecl 0x1d55d88 </workspace/SYsU-lang/parser/debug/test.sysu.c:1:1, line:9:1> line:1:5 test 'int ()'
+  `-CompoundStmt 0x1d55fb8 <col:11, line:9:1>
+    |-IfStmt 0x1d55f60 <line:2:5, line:7:5> has_else
+    | |-BinaryOperator 0x1d55eb0 <line:2:8, col:13> 'int' '=='
+    | | |-IntegerLiteral 0x1d55e70 <col:8> 'int' 1
+    | | `-IntegerLiteral 0x1d55e90 <col:13> 'int' 2
+    | |-CompoundStmt 0x1d55f00 <col:15, line:4:5>
+    | | `-ReturnStmt 0x1d55ef0 <line:3:9, col:16>
+    | |   `-IntegerLiteral 0x1d55ed0 <col:16> 'int' 1
+    | `-CompoundStmt 0x1d55f48 <line:5:9, line:7:5>
+    |   `-ReturnStmt 0x1d55f38 <line:6:9, col:16>
+    |     `-IntegerLiteral 0x1d55f18 <col:16> 'int' 2
+    `-ReturnStmt 0x1d55fa8 <line:8:5, col:12>
+      `-IntegerLiteral 0x1d55f88 <col:12> 'int' 0

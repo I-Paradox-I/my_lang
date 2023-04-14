@@ -1,6 +1,6 @@
 char 'char'	[StartOfLine] Loc=</workspace/SYsU-lang/lexer/test.sysu.c:1:1>
 identifier 'a'	[LeadingSpace] Loc=</workspace/SYsU-lang/lexer/test.sysu.c:1:6>
 equal '='	[LeadingSpace] Loc=</workspace/SYsU-lang/lexer/test.sysu.c:1:8>
-char_constant ''a''	[LeadingSpace] Loc=</workspace/SYsU-lang/lexer/test.sysu.c:1:10>
-semi ';'	Loc=</workspace/SYsU-lang/lexer/test.sysu.c:1:13>
-eof ''		Loc=</workspace/SYsU-lang/lexer/test.sysu.c:1:14>
+char_constant ''\n''	[LeadingSpace] Loc=</workspace/SYsU-lang/lexer/test.sysu.c:1:10>
+semi ';'	Loc=</workspace/SYsU-lang/lexer/test.sysu.c:1:14>
+eof ''		Loc=</workspace/SYsU-lang/lexer/test.sysu.c:1:15>

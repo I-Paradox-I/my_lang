@@ -45,11 +45,16 @@
 extern int yydebug;
 #endif
 /* "%code requires" blocks.  */
-#line 2 "/workspace/SYsU-lang/parser/build/parser.y"
+#line 186 "/workspace/SYsU-lang/parser/build/parser.y"
 
-class Tree;
+#include "asg.hpp"
+#include <vector>
+#include <memory>
+#include <llvm/Support/JSON.h>
+#include <llvm/Support/MemoryBuffer.h>
+#include <llvm/Support/raw_ostream.h>
 
-#line 53 "/workspace/SYsU-lang/parser/build/parser.hh"
+#line 58 "/workspace/SYsU-lang/parser/build/parser.hh"
 
 /* Token kinds.  */
 #ifndef YYTOKENTYPE
@@ -77,39 +82,49 @@ class Tree;
     T_LEFT_BRACE = 272,            /* T_LEFT_BRACE  */
     T_RIGHT_BRACE = 273,           /* T_RIGHT_BRACE  */
     T_SEMI = 274,                  /* T_SEMI  */
-    T_COMMA = 275,                 /* T_COMMA  */
-    T_EQUAL = 276,                 /* T_EQUAL  */
-    T_PIPEPIPE = 277,              /* T_PIPEPIPE  */
-    T_AMPAMP = 278,                /* T_AMPAMP  */
-    T_EQUALEQUAL = 279,            /* T_EQUALEQUAL  */
-    T_EXCLAIMEQUAL = 280,          /* T_EXCLAIMEQUAL  */
-    T_LESS = 281,                  /* T_LESS  */
-    T_GREATER = 282,               /* T_GREATER  */
-    T_LESSEQUAL = 283,             /* T_LESSEQUAL  */
-    T_GREATEREQUAL = 284,          /* T_GREATEREQUAL  */
-    T_PLUS = 285,                  /* T_PLUS  */
-    T_MINUS = 286,                 /* T_MINUS  */
-    T_STAR = 287,                  /* T_STAR  */
-    T_SLASH = 288,                 /* T_SLASH  */
-    T_PERCENT = 289,               /* T_PERCENT  */
-    T_EXCLAIM = 290,               /* T_EXCLAIM  */
-    T_LEFT_SQUARE = 291,           /* T_LEFT_SQUARE  */
-    T_RIGHT_SQUARE = 292,          /* T_RIGHT_SQUARE  */
-    T_LEFT_PAREN = 293,            /* T_LEFT_PAREN  */
-    T_RIGHT_PAREN = 294,           /* T_RIGHT_PAREN  */
-    T_ELLIPSIS = 295,              /* T_ELLIPSIS  */
-    T_IDENTIFIER = 296,            /* T_IDENTIFIER  */
-    T_INTEGER_LITERAL = 297,       /* T_INTEGER_LITERAL  */
-    T_FLOATING_LITERAL = 298,      /* T_FLOATING_LITERAL  */
-    T_STRING_LITERAL = 299,        /* T_STRING_LITERAL  */
-    T_CHAR_CONSTANT = 300          /* T_CHAR_CONSTANT  */
+    T_EOF = 275,                   /* T_EOF  */
+    T_COMMA = 276,                 /* T_COMMA  */
+    T_EQUAL = 277,                 /* T_EQUAL  */
+    T_PIPEPIPE = 278,              /* T_PIPEPIPE  */
+    T_AMPAMP = 279,                /* T_AMPAMP  */
+    T_EQUALEQUAL = 280,            /* T_EQUALEQUAL  */
+    T_EXCLAIMEQUAL = 281,          /* T_EXCLAIMEQUAL  */
+    T_LESS = 282,                  /* T_LESS  */
+    T_GREATER = 283,               /* T_GREATER  */
+    T_LESSEQUAL = 284,             /* T_LESSEQUAL  */
+    T_GREATEREQUAL = 285,          /* T_GREATEREQUAL  */
+    T_PLUS = 286,                  /* T_PLUS  */
+    T_MINUS = 287,                 /* T_MINUS  */
+    T_STAR = 288,                  /* T_STAR  */
+    T_SLASH = 289,                 /* T_SLASH  */
+    T_PERCENT = 290,               /* T_PERCENT  */
+    T_EXCLAIM = 291,               /* T_EXCLAIM  */
+    UOP = 292,                     /* UOP  */
+    T_LEFT_SQUARE = 293,           /* T_LEFT_SQUARE  */
+    T_RIGHT_SQUARE = 294,          /* T_RIGHT_SQUARE  */
+    T_LEFT_PAREN = 295,            /* T_LEFT_PAREN  */
+    T_RIGHT_PAREN = 296,           /* T_RIGHT_PAREN  */
+    T_ELLIPSIS = 297,              /* T_ELLIPSIS  */
+    T_IDENTIFIER = 298,            /* T_IDENTIFIER  */
+    T_INTEGER_LITERAL = 299,       /* T_INTEGER_LITERAL  */
+    T_FLOATING_LITERAL = 300,      /* T_FLOATING_LITERAL  */
+    T_STRING_LITERAL = 301,        /* T_STRING_LITERAL  */
+    T_CHAR_LITERAL = 302           /* T_CHAR_LITERAL  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-typedef union YYSTYPE  YYSTYPE;
+typedef 
+  union
+  {
+    Obj* obj;
+	  Decl* decl;	
+    Expr* expr;
+    Stmt* stmt;
+  }
+ YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
 #endif

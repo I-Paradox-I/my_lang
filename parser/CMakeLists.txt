@@ -8,9 +8,9 @@
 # install(TARGETS sysu-parser)
 find_package(LLVM REQUIRED)
 find_package(BISON REQUIRED)
-bison_target(parser build/parser.y ${CMAKE_CURRENT_SOURCE_DIR}/build/main.cc 
+bison_target(parser ${CMAKE_CURRENT_SOURCE_DIR}/build/parser.y ${CMAKE_CURRENT_SOURCE_DIR}/build/parser.cc 
         DEFINES_FILE ${CMAKE_CURRENT_SOURCE_DIR}/build/parser.hh COMPILE_FLAGS --debug)
-add_executable(sysu-parser build/main.cc ${BISON_parser_OUTPUT_SOURCE})
+add_executable(sysu-parser ${CMAKE_CURRENT_SOURCE_DIR}/build/parser.cc ${CMAKE_CURRENT_SOURCE_DIR}/build/main.cpp ${CMAKE_CURRENT_SOURCE_DIR}/build/ToJson.cpp ${BISON_parser_OUTPUT_SOURCE})
 llvm_map_components_to_libnames(LLVM_LIBS support)
 target_link_libraries(sysu-parser ${LLVM_LIBS})
 target_include_directories(sysu-parser PRIVATE ${LLVM_INCLUDE_DIRS} )
