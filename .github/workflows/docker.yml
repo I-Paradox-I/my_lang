@@ -5,10 +5,6 @@ name: docker
 # separate terms of service, privacy policy, and support
 # documentation.
 
-#停用
-disabled: true
-# xuhao 20337256 不需要在github上构建workflow
-
 on:
   push:
     branches: [latest, unstable-slim]
@@ -112,3 +108,7 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           platforms: linux/amd64,linux/arm64/v8,linux/386,linux/arm/v7,linux/mips64le,linux/ppc64le #,linux/arm/v5,linux/s390x #,linux/riscv64 # <https://github.com/docker-library/official-images/pull/14015>
           build-args: debian:unstable-slim
+
+#停用
+disabled: true
+# xuhao 20337256 不需要在github上构建workflow
