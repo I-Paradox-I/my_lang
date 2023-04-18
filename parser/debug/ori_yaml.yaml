@@ -1,52 +1,9 @@
 kind: TranslationUnitDecl
 inner:
-- kind: VarDecl
-  type:
-    qualType: int
-  name: a
-- kind: FunctionDecl
-  type:
-    qualType: double (int, double)
-  name: test
-  inner:
-  - kind: ParmVarDecl
-    type:
-      qualType: int
-    name: x
-  - kind: ParmVarDecl
-    type:
-      qualType: double
-    name: y
-  - kind: CompoundStmt
-    inner:
-    - kind: ReturnStmt
-      inner:
-      - kind: BinaryOperator
-        type:
-          qualType: double
-        inner:
-        - kind: ImplicitCastExpr
-          type:
-            qualType: double
-          inner:
-          - kind: ImplicitCastExpr
-            type:
-              qualType: int
-            inner:
-            - kind: DeclRefExpr
-              type:
-                qualType: int
-        - kind: ImplicitCastExpr
-          type:
-            qualType: double
-          inner:
-          - kind: DeclRefExpr
-            type:
-              qualType: double
 - kind: FunctionDecl
   type:
     qualType: int ()
-  name: main
+  name: ifElse
   inner:
   - kind: CompoundStmt
     inner:
@@ -55,7 +12,7 @@ inner:
       - kind: VarDecl
         type:
           qualType: int
-        name: b
+        name: a
     - kind: BinaryOperator
       type:
         qualType: int
@@ -66,67 +23,99 @@ inner:
       - kind: IntegerLiteral
         type:
           qualType: int
-        value: '10'
-    - kind: BinaryOperator
-      type:
-        qualType: int
+        value: '5'
+    - kind: IfStmt
       inner:
-      - kind: DeclRefExpr
+      - kind: UnaryOperator
         type:
           qualType: int
-      - kind: IntegerLiteral
-        type:
-          qualType: int
-        value: '20'
-    - kind: CallExpr
-      type:
-        qualType: double
-      inner:
-      - kind: ImplicitCastExpr
-        type:
-          qualType: double (*)(int, double)
         inner:
-        - kind: DeclRefExpr
+        - kind: ImplicitCastExpr
           type:
-            qualType: double (int, double)
-      - kind: ImplicitCastExpr
+            qualType: int
+          inner:
+          - kind: DeclRefExpr
+            type:
+              qualType: int
+      - kind: CompoundStmt
+        inner:
+        - kind: BinaryOperator
+          type:
+            qualType: int
+          inner:
+          - kind: DeclRefExpr
+            type:
+              qualType: int
+          - kind: IntegerLiteral
+            type:
+              qualType: int
+            value: '25'
+      - kind: CompoundStmt
+        inner:
+        - kind: BinaryOperator
+          type:
+            qualType: int
+          inner:
+          - kind: DeclRefExpr
+            type:
+              qualType: int
+          - kind: BinaryOperator
+            type:
+              qualType: int
+            inner:
+            - kind: ImplicitCastExpr
+              type:
+                qualType: int
+              inner:
+              - kind: DeclRefExpr
+                type:
+                  qualType: int
+            - kind: IntegerLiteral
+              type:
+                qualType: int
+              value: '2'
+    - kind: ReturnStmt
+      inner:
+      - kind: ParenExpr
+        type:
+          qualType: int
+        inner:
+        - kind: BinaryOperator
+          type:
+            qualType: int
+          inner:
+          - kind: ImplicitCastExpr
+            type:
+              qualType: int
+            inner:
+            - kind: DeclRefExpr
+              type:
+                qualType: int
+          - kind: IntegerLiteral
+            type:
+              qualType: int
+            value: '2'
+- kind: FunctionDecl
+  type:
+    qualType: int ()
+  name: main
+  inner:
+  - kind: CompoundStmt
+    inner:
+    - kind: ReturnStmt
+      inner:
+      - kind: ParenExpr
         type:
           qualType: int
         inner:
         - kind: CallExpr
           type:
-            qualType: double
+            qualType: int
           inner:
           - kind: ImplicitCastExpr
             type:
-              qualType: double (*)(int, double)
+              qualType: int (*)()
             inner:
             - kind: DeclRefExpr
               type:
-                qualType: double (int, double)
-          - kind: IntegerLiteral
-            type:
-              qualType: int
-            value: '10'
-          - kind: ImplicitCastExpr
-            type:
-              qualType: double
-            inner:
-            - kind: IntegerLiteral
-              type:
-                qualType: int
-              value: '20'
-      - kind: ImplicitCastExpr
-        type:
-          qualType: double
-        inner:
-        - kind: IntegerLiteral
-          type:
-            qualType: int
-          value: '20'
-    - kind: ReturnStmt
-      inner:
-      - kind: IntegerLiteral
-        type:
-          qualType: int
-        value: '0'
+                qualType: int ()

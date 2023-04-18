@@ -1,9 +1,16 @@
-int a;
-double test(int x, double y){return x+y;}
-int main(){
-    int b ;
-	a=10;
-    b = 20;
-    test(test(10,20),20);
-	return 0;
+// test if-else
+int ifElse() {
+  int a;
+  a = 5;
+  if (!a) {
+    a = 25;
+  } else {
+    a = a * 2;
+  }
+  return (a+2);
+}
+
+
+int main() {
+  return (ifElse());
 }

@@ -1,3 +1,9 @@
-19,20d18
-<         type:
-<           qualType: int
+33c33
+<         - kind: ImplicitCastExpr
+---
+>         - kind: DeclRefExpr
+36,39d35
+<           inner:
+<           - kind: DeclRefExpr
+<             type:
+<               qualType: int

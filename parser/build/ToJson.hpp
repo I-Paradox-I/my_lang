@@ -31,6 +31,14 @@ public:
 
     llvm::json::Value operator()(BinaryOperator* obj);
 
+    llvm::json::Value operator()(DeclRefExpr* obj);
+
+    llvm::json::Value operator()(CallExpr* obj);
+
+    llvm::json::Value operator()(ArraySubscriptExpr* obj);
+
+    llvm::json::Value operator()(ImplicitCastExpr* obj);
+
 //Decl
     llvm::json::Object operator()(TranslationUnitDecl* obj);
 
@@ -49,6 +57,10 @@ public:
     llvm::json::Object operator()(NullStmt* obj);
     
     llvm::json::Object operator()(DeclStmt* obj);
+
+    llvm::json::Object operator()(AssignStmt* obj);
+    
+    llvm::json::Object operator()(CallExprStmt* obj);
 
     llvm::json::Object operator()(ReturnStmt* obj);
 

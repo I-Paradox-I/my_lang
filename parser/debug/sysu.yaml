@@ -3,7 +3,7 @@ inner:
 - kind: FunctionDecl
   type:
     qualType: int ()
-  name: test
+  name: ifElse
   inner:
   - kind: CompoundStmt
     inner:
@@ -13,60 +13,105 @@ inner:
         type:
           qualType: int
         name: a
+    - kind: BinaryOperator
+      type:
+        qualType: int
+      inner:
+      - kind: DeclRefExpr
+        type:
+          qualType: int
+      - kind: IntegerLiteral
+        type:
+          qualType: int
+        value: '5'
     - kind: IfStmt
       inner:
-      - kind: BinaryOperator
+      - kind: UnaryOperator
+        type:
+          qualType: int
         inner:
-        - kind: IntegerLiteral
+        - kind: DeclRefExpr
           type:
             qualType: int
-          value: '1'
-        - kind: IntegerLiteral
-          type:
-            qualType: int
-          value: '2'
       - kind: CompoundStmt
         inner:
-        - kind: ReturnStmt
+        - kind: BinaryOperator
+          type:
+            qualType: int
           inner:
+          - kind: DeclRefExpr
+            type:
+              qualType: int
           - kind: IntegerLiteral
             type:
               qualType: int
-            value: '1'
+            value: '25'
       - kind: CompoundStmt
         inner:
-        - kind: ReturnStmt
+        - kind: BinaryOperator
+          type:
+            qualType: int
           inner:
+          - kind: DeclRefExpr
+            type:
+              qualType: int
+          - kind: BinaryOperator
+            type:
+              qualType: int
+            inner:
+            - kind: ImplicitCastExpr
+              type:
+                qualType: int
+              inner:
+              - kind: DeclRefExpr
+                type:
+                  qualType: int
+            - kind: IntegerLiteral
+              type:
+                qualType: int
+              value: '2'
+    - kind: ReturnStmt
+      inner:
+      - kind: ParenExpr
+        type:
+          qualType: int
+        inner:
+        - kind: BinaryOperator
+          type:
+            qualType: int
+          inner:
+          - kind: ImplicitCastExpr
+            type:
+              qualType: int
+            inner:
+            - kind: DeclRefExpr
+              type:
+                qualType: int
           - kind: IntegerLiteral
             type:
               qualType: int
             value: '2'
-    - kind: DoStmt
-      inner:
-      - kind: CompoundStmt
-        inner:
-        - kind: ReturnStmt
-          inner:
-          - kind: IntegerLiteral
-            type:
-              qualType: int
-            value: '1'
-      - kind: IntegerLiteral
-        type:
-          qualType: int
-        value: '1'
-    - kind: WhileStmt
-      inner:
-      - kind: IntegerLiteral
-        type:
-          qualType: int
-        value: '2'
-      - kind: CompoundStmt
-        inner:
-        - kind: BreakStmt
+- kind: FunctionDecl
+  type:
+    qualType: int ()
+  name: main
+  inner:
+  - kind: CompoundStmt
+    inner:
     - kind: ReturnStmt
       inner:
-      - kind: IntegerLiteral
+      - kind: ParenExpr
         type:
           qualType: int
-        value: '0'
+        inner:
+        - kind: CallExpr
+          type:
+            qualType: int
+          inner:
+          - kind: ImplicitCastExpr
+            type:
+              qualType: int (*)()
+            inner:
+            - kind: DeclRefExpr
+              type:
+                qualType: int ()

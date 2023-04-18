@@ -1,5 +1,5 @@
 #!/bin/bash
-parser=${1:-"parser-1"}
+parser=${1:-"parser-2"}
   ( export PATH=$HOME/sysu/bin:$PATH  \
     CPATH=$HOME/sysu/include:$CPATH   \
     LIBRARY_PATH=$HOME/sysu/lib:$LIBRARY_PATH   \

@@ -27,8 +27,14 @@
             return (*this)(p);
         if (auto p = dynamic_cast<BinaryOperator*>(obj))
             return (*this)(p);
-        // if (auto p = dynamic_cast<DeclRefExpr*>(obj))
-        //     return (*this)(p);
+        if (auto p = dynamic_cast<DeclRefExpr*>(obj))
+            return (*this)(p);
+        if (auto p = dynamic_cast<ArraySubscriptExpr*>(obj))
+            return (*this)(p);
+        if (auto p = dynamic_cast<ImplicitCastExpr*>(obj))
+            return (*this)(p);
+        if (auto p = dynamic_cast<CallExpr*>(obj))
+            return (*this)(p);
         // if (auto p = dynamic_cast<BinaryExpr*>(obj))
         //     return (*this)(p);
         return "Not specified Expr.";
@@ -54,6 +60,10 @@
         if (auto p = dynamic_cast<NullStmt*>(obj))
             return (*this)(p);
         if (auto p = dynamic_cast<DeclStmt*>(obj))
+            return (*this)(p);
+        if (auto p = dynamic_cast<AssignStmt*>(obj))
+            return (*this)(p);
+        if (auto p = dynamic_cast<CallExprStmt*>(obj))
             return (*this)(p);
         if (auto p = dynamic_cast<ReturnStmt*>(obj))
             return (*this)(p);
@@ -115,8 +125,8 @@
             {"kind", obj->kind},
         };
 
-        if(!obj->type.print().empty() && obj->type.is_array) temp["type"] = llvm::json::Object{{"desugaredQualType", obj->process_type()},{"qualType", obj->process_type()},};
-        else temp["type"] = llvm::json::Object{{"qualType", obj->process_type()},};
+        if(obj->type.is_param && obj->type.is_array) temp["type"] = llvm::json::Object{{"desugaredQualType", obj->type.print()},{"qualType", obj->type.print()},};
+        else temp["type"] = llvm::json::Object{{"qualType", obj->type.print()},};
         if(!obj->name.empty()) temp["name"] = obj->name;
         if(!obj->inner.empty()){
             temp["inner"] = llvm::json::Array{};
@@ -180,11 +190,13 @@
     llvm::json::Value ToJson::operator()(InitListExpr* obj){
         llvm::json::Object temp{
             {"kind", obj->kind},
-            {"inner", llvm::json::Array{}}
         };
         if(!obj->type.print().empty()) temp["type"] = llvm::json::Object{{"qualType", obj->type.print()},};
-        for(auto & it: obj->inner){
-            temp.get("inner")->getAsArray()->push_back((*this)(it));
+        if(!obj->inner.empty()){
+            temp["inner"] = llvm::json::Array{};
+            for(auto & it: obj->inner){
+                temp.get("inner")->getAsArray()->push_back((*this)(it));
+            }
         }
         return temp;
     }    
@@ -225,6 +237,50 @@
         return temp;
     }
 
+    llvm::json::Value ToJson::operator()(DeclRefExpr* obj){
+        llvm::json::Object temp;
+        temp["kind"] = obj->kind;
+        if(obj->type.is_param && obj->type.is_array) temp["type"] = llvm::json::Object{{"desugaredQualType", obj->type.print()},{"qualType", obj->type.print()},};
+        else temp["type"] = llvm::json::Object{{"qualType", obj->type.print()},};
+        return temp;
+    }
+
+    llvm::json::Value ToJson::operator()(CallExpr* obj){
+        llvm::json::Object temp{
+            {"kind", obj->kind},
+            {"inner", llvm::json::Array{}}
+        };
+        if(!obj->type.print().empty()) temp["type"] = llvm::json::Object{{"qualType", obj->type.print()},};
+        for(auto & it: obj->inner){
+            temp.get("inner")->getAsArray()->push_back((*this)(it));
+        }
+        return temp;
+    }
+
+    llvm::json::Value ToJson::operator()(ArraySubscriptExpr* obj){
+        llvm::json::Object temp{
+            {"kind", obj->kind},
+            {"inner", llvm::json::Array{}}
+        };
+        if(!obj->type.print().empty()) temp["type"] = llvm::json::Object{{"qualType", obj->type.print()},};
+        for(auto & it: obj->inner){
+            temp.get("inner")->getAsArray()->push_back((*this)(it));
+        }
+        return temp;
+    }
+
+    llvm::json::Value ToJson::operator()(ImplicitCastExpr* obj){
+        llvm::json::Object temp{
+            {"kind", obj->kind},
+            {"inner", llvm::json::Array{}}
+        };
+        if(obj->type.is_param && obj->type.is_array) temp["type"] = llvm::json::Object{{"desugaredQualType", obj->type.print()},{"qualType", obj->type.print()},};
+        else temp["type"] = llvm::json::Object{{"qualType", obj->type.print()},};
+        for(auto & it: obj->inner){
+            temp.get("inner")->getAsArray()->push_back((*this)(it));
+        }
+        return temp;
+    }
 
 //Stmt
     llvm::json::Object ToJson::operator()(CompoundStmt* obj) {
@@ -256,13 +312,39 @@
         return temp;
     }
 
-    llvm::json::Object ToJson::operator()(ReturnStmt* obj) {
+    llvm::json::Object ToJson::operator()(AssignStmt* obj){
         llvm::json::Object temp{
             {"kind", obj->kind},
             {"inner", llvm::json::Array{}}
         };
+        if(!obj->type.print().empty()) temp["type"] = llvm::json::Object{{"qualType", obj->type.print()},};
         for(auto & it: obj->inner){
             temp.get("inner")->getAsArray()->push_back((*this)(it));
+        }
+        return temp;
+    }
+
+    llvm::json::Object ToJson::operator()(CallExprStmt* obj){
+        llvm::json::Object temp{
+            {"kind", obj->kind},
+            {"inner", llvm::json::Array{}}
+        };
+        if(!obj->type.print().empty()) temp["type"] = llvm::json::Object{{"qualType", obj->type.print()},};
+        for(auto & it: obj->inner){
+            temp.get("inner")->getAsArray()->push_back((*this)(it));
+        }
+        return temp;
+    }
+
+    llvm::json::Object ToJson::operator()(ReturnStmt* obj) {
+        llvm::json::Object temp{
+            {"kind", obj->kind},
+        };
+        if(!obj->inner.empty()){
+            temp["inner"] = llvm::json::Array{};
+            for(auto & it: obj->inner){
+                temp.get("inner")->getAsArray()->push_back((*this)(it));
+            }
         }
         return temp;
     }
@@ -314,14 +396,9 @@
 
 //functions
     void ToJson::print(Obj* obj){
-        if (auto p = dynamic_cast<Decl*>(obj)){
-            llvm::json::Object temp_decl = (*this)(p);
-            llvm::outs() << llvm::json::Value(std::move(temp_decl));
-        }
-        else if (auto p = dynamic_cast<Expr*>(obj)){
-            llvm::json::Value temp_expr = (*this)(p);
-            llvm::outs() << temp_expr;
-        }
+        auto p = dynamic_cast<Decl*>(obj);
+        llvm::json::Object temp_decl = (*this)(p);
+        llvm::outs() << llvm::json::Value(std::move(temp_decl));
     }
 
     void ToJson::visit(Obj* obj){

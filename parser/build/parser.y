@@ -31,7 +31,6 @@ auto wk_getline(char endline = "\n"[0]) {
 
 Obj* root;
 Mgr gMgr;
-ScopeList gScopeList;
 
 auto yylex() {
   auto tk = wk_getline();
@@ -143,8 +142,14 @@ auto yylex() {
       auto expr = gMgr.make<IntegerLiteral>();
       expr->type.basic_type = Type::my_int;
       expr->kind = "IntegerLiteral";
-      expr->value = s;
-      expr->val = std::stoi((std::string)(s));
+      if(s[0] == '0' && (s[1] == 'x' || s[1] == 'X')){
+        expr->val = std::stoi((std::string)(s), 0, 16);
+        expr->value = std::to_string(expr->val);
+      }
+      else{
+        expr->val = std::stoi((std::string)(s));
+        expr->value = std::to_string(expr->val);
+      }
       expr->type.basic_type = Type::my_int;
       yylval.expr = expr;
       return T_INTEGER_LITERAL;
@@ -270,15 +275,21 @@ auto yylex() {
 %nterm <expr> unaryoperator
 %nterm <expr> binaryoperator
 %nterm <expr> parenexpr
+%nterm <expr> declrefexpr
+%nterm <expr> callexpr
+%nterm <expr> arraysubscriptexpr
 %nterm <expr> primaryexpr
 %nterm <expr> primaryexprlist
 %nterm <expr> bracedlistexpr
 %nterm <expr> implicitcastexpr
+%nterm <expr> lvalexpr
 
 %nterm <stmt> stmt
 %nterm <stmt> compoundstmt
 %nterm <stmt> stmtseq
 %nterm <stmt> declstmt
+%nterm <stmt> assignstmt
+%nterm <stmt> callexprstmt
 %nterm <stmt> ifstmt
 %nterm <stmt> dostmt
 %nterm <stmt> whilestmt
@@ -352,7 +363,6 @@ vardeclseq:
   {
     auto decl = gMgr.make<VarDeclSeq>();
     auto p = dynamic_cast<DeclaratorList*>($2);
-    p->reverse();
     decl->seq = p->seq;
     for(auto it: decl->seq){
       auto iter = dynamic_cast<VarDecl*>(it);
@@ -406,13 +416,24 @@ uninitdeclarator:
   }
 ;
 
-arrayuninitdeclaratorlist: 
-  T_LEFT_SQUARE T_INTEGER_LITERAL T_RIGHT_SQUARE 
+arrayuninitdeclaratorlist:
+  T_LEFT_SQUARE T_RIGHT_SQUARE 
+  {
+    $$ = gMgr.make<Decl>();
+    $$->type.is_array = 1;
+    $$->type.dim.push_back(-1);
+   }
+| T_LEFT_SQUARE T_INTEGER_LITERAL T_RIGHT_SQUARE 
   {
     $$ = gMgr.make<Decl>();
     auto p = dynamic_cast<IntegerLiteral*>($2);
     $$->type.is_array = 1;
     $$->type.dim.push_back(p->val);
+   }
+| T_LEFT_SQUARE T_RIGHT_SQUARE arrayuninitdeclaratorlist
+  {
+    $$ = $3;
+    $$->type.dim.push_back(-1);
    }
 |  T_LEFT_SQUARE T_INTEGER_LITERAL T_RIGHT_SQUARE arrayuninitdeclaratorlist
   {
@@ -424,7 +445,8 @@ arrayuninitdeclaratorlist:
 
 ptruninitdeclarator:  
   T_IDENTIFIER
-| T_STAR ptruninitdeclarator {
+| T_STAR ptruninitdeclarator 
+  {
     $$ = $2;
     $$->type.is_ptr += 1;
   }
@@ -445,8 +467,11 @@ functiondecl:
     for(auto & iter : p->seq){
         auto q = dynamic_cast<ParmVarDecl*>(iter);
         decl->inner.push_back(q);
-        decl->type.params.push_back(q->process_type());
+        decl->type.params.push_back(q->type.print());
     }
+    if(p->ellipsis == 1)
+      decl->type.params.push_back("...");
+    
     $$ = decl;
   }
 | typespecifier T_IDENTIFIER T_LEFT_PAREN paramslist T_RIGHT_PAREN compoundstmt
@@ -461,9 +486,13 @@ functiondecl:
     for(auto & iter : p->seq){
         auto tmp = dynamic_cast<ParmVarDecl*>(iter);
         decl->inner.push_back(tmp);
-        decl->type.params.push_back(tmp->process_type());
+        decl->type.params.push_back(tmp->type.print());
     }
+    if(p->ellipsis == 1)
+      decl->type.params.push_back("...");
+    
     decl->inner.push_back(q);
+    decl->defined = 1;
     $$ = decl;
   }
 ;
@@ -472,6 +501,12 @@ paramslist:
   /*empty*/
   {
     auto decl = gMgr.make<ParamsList>();
+    $$ = decl;
+  }
+| T_ELLIPSIS
+  {
+    auto decl = gMgr.make<ParamsList>();
+    decl->ellipsis = 1;
     $$ = decl;
   }
 | parmvardecl
@@ -493,6 +528,7 @@ parmvardecl:
   {
     auto decl = gMgr.make<ParmVarDecl>();
     decl->type = $1->type;
+    decl->type.is_param = 1;
     $$ = decl;
   }
 | typespecifier uninitdeclarator 
@@ -502,6 +538,7 @@ parmvardecl:
     decl->type.is_const = $1->type.is_const;
     decl->type.basic_type = $1->type.basic_type;
     decl->name = $2->name;
+    decl->type.is_param = 1;
     $$ = decl;
   }
 ;
@@ -572,12 +609,14 @@ simpletypespecifier:
 primaryexpr: 
   literalexpr
 | bracedlistexpr
-| implicitcastexpr
 ;
 
 numexpr: 
   T_INTEGER_LITERAL
 | T_FLOATING_LITERAL
+| declrefexpr
+| callexpr
+| arraysubscriptexpr
 | binaryoperator
 | unaryoperator
 | parenexpr
@@ -663,6 +702,22 @@ binaryoperator:
     expr->inner.push_back($3);
     $$ = expr;
   }
+| numexpr T_LESS numexpr
+  {
+    auto expr = gMgr.make<BinaryOperator>();
+    expr->op = BinaryOperator::kLess;
+    expr->inner.push_back($1);
+    expr->inner.push_back($3);
+    $$ = expr;
+  }
+| numexpr T_GREATER numexpr
+  {
+    auto expr = gMgr.make<BinaryOperator>();
+    expr->op = BinaryOperator::kGreater;
+    expr->inner.push_back($1);
+    expr->inner.push_back($3);
+    $$ = expr;
+  }
 | numexpr T_LESSEQUAL numexpr
   {
     auto expr = gMgr.make<BinaryOperator>();
@@ -687,6 +742,14 @@ binaryoperator:
     expr->inner.push_back($3);
     $$ = expr;
   }
+| numexpr T_EXCLAIMEQUAL numexpr
+  {
+    auto expr = gMgr.make<BinaryOperator>();
+    expr->op = BinaryOperator::kExclaimEqual;
+    expr->inner.push_back($1);
+    expr->inner.push_back($3);
+    $$ = expr;
+  }
 | numexpr T_AMPAMP numexpr
   {
     auto expr = gMgr.make<BinaryOperator>();
@@ -705,7 +768,6 @@ binaryoperator:
   }
 ;
 
-
 parenexpr:
   T_LEFT_PAREN numexpr T_RIGHT_PAREN
   {
@@ -715,13 +777,77 @@ parenexpr:
   }
 ;
 
+declrefexpr:
+  T_IDENTIFIER
+  {
+    auto expr = gMgr.make<DeclRefExpr>();
+    expr->name = $1->name;
+    $$ = expr;
+  }
+;
 
+arraysubscriptexpr: 
+  declrefexpr T_LEFT_SQUARE numexpr T_RIGHT_SQUARE
+  {
+    auto expr = gMgr.make<ArraySubscriptExpr>();
+//    if(auto p = dynamic_cast<IntegerLiteral*>($3)){
+//      expr->type = $1->type;
+//      expr->type.is_array = 1;
+//      expr->type.dim.push_back(p->val);
+//    }
+    expr->inner.push_back($1);
+    expr->inner.push_back($3);
+    $$ = expr;
+  }
+| arraysubscriptexpr T_LEFT_SQUARE numexpr T_RIGHT_SQUARE
+  {
+    auto expr = gMgr.make<ArraySubscriptExpr>();
+//    if(auto p = dynamic_cast<IntegerLiteral*>($3)){
+//      expr->type = $1->type;
+//      expr->type.is_array = 1;
+//      expr->type.dim.push_back(p->val);
+//    }
+    expr->inner.push_back($1);
+    expr->inner.push_back($3);
+    $$ = expr;
+  }
+;
+
+lvalexpr:
+  declrefexpr
+| arraysubscriptexpr
+;
+
+callexpr:
+  declrefexpr T_LEFT_PAREN T_RIGHT_PAREN
+  {
+    auto expr = gMgr.make<CallExpr>();
+    auto declrefexpr = dynamic_cast<DeclRefExpr*>($1);
+    expr->name = declrefexpr->name;
+    expr->inner.push_back($1);
+    $$ = expr;
+  }
+| declrefexpr T_LEFT_PAREN primaryexprlist T_RIGHT_PAREN
+  {
+    auto expr = gMgr.make<CallExpr>();
+    auto declrefexpr = dynamic_cast<DeclRefExpr*>($1);
+    auto p = dynamic_cast<PrimaryExprList*>($3);
+    expr->inner.push_back($1);
+    p->reverse();
+    for(auto it : p->seq)
+      expr->inner.push_back(it);
+    expr->name = declrefexpr->name;
+    $$ = expr;
+  }
+;
 
 bracedlistexpr:
   T_LEFT_BRACE primaryexprlist T_RIGHT_BRACE 
   {
-    auto expr = dynamic_cast<InitListExpr*>($2);
-    expr->reverse();
+    auto expr = gMgr.make<InitListExpr>();
+    auto p = dynamic_cast<PrimaryExprList*>($2);
+    p->reverse();
+    expr->inner = p->seq;
     $$ = expr;
   }
 ;
@@ -729,14 +855,14 @@ bracedlistexpr:
 primaryexprlist:
   primaryexpr
   {
-    auto expr = gMgr.make<InitListExpr>();
-    expr->inner.push_back($1);
+    auto expr = gMgr.make<PrimaryExprList>();
+    expr->seq.push_back($1);
     $$ = expr;
   }
 | primaryexpr T_COMMA primaryexprlist
   {
-    auto expr = dynamic_cast<InitListExpr*>($3);
-    expr->inner.push_back($1);
+    auto expr = dynamic_cast<PrimaryExprList*>($3);
+    expr->seq.push_back($1);
     $$ = expr;
   }
 ;
@@ -753,6 +879,8 @@ condition:
 stmt: 
   compoundstmt
 | declstmt
+| assignstmt
+| callexprstmt
 | ifstmt
 | dostmt
 | whilestmt
@@ -800,15 +928,44 @@ declstmt:
   {
     auto stmt = gMgr.make<DeclStmt>();
     if(auto q = dynamic_cast<VarDeclSeq*>($1)){
+      q->reverse();
       for(auto & iter : q->seq)
-      stmt->inner.push_back(std::move(iter));
+        stmt->inner.push_back(std::move(iter));
       $$ = stmt;
     }
   }
 ;
 
+assignstmt: 
+  lvalexpr T_EQUAL numexpr T_SEMI
+  {
+    auto stmt = gMgr.make<AssignStmt>();
+    stmt->inner.push_back($1);
+    stmt->inner.push_back($3);
+    $$ = stmt;
+  }
+;
+
+callexprstmt:
+  callexpr T_SEMI
+  {
+    auto stmt = gMgr.make<CallExprStmt>();
+    auto obj = dynamic_cast<CallExpr*>($1);
+    stmt->kind = obj->kind;
+    stmt->name = obj->name;
+    stmt->inner = obj->inner;
+    stmt->decl = obj->decl;
+    $$ = stmt;
+  }
+;
+
 returnstmt:
-  T_RETURN primaryexpr T_SEMI
+  T_RETURN T_SEMI
+  {
+    auto stmt = gMgr.make<ReturnStmt>();
+    $$ = stmt;
+  }
+| T_RETURN primaryexpr T_SEMI
   {
     auto stmt = gMgr.make<ReturnStmt>();
     stmt->inner.push_back($2);

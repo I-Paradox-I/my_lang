@@ -10,9 +10,13 @@ extern  Mgr gMgr;
 
 
 int main() {
-  yydebug = 1; 
+  // yydebug = 1; 
   // sleep(20); //调试时使用
   yyparse();
+
+  Typing process;
+  process.visit(root);
+
   ToJson toJson;
   toJson.visit(root);
 }
