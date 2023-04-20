@@ -286,10 +286,12 @@
     llvm::json::Object ToJson::operator()(CompoundStmt* obj) {
         llvm::json::Object temp{
             {"kind", obj->kind},
-            {"inner", llvm::json::Array{}}
         };
-        for(auto & it: obj->inner){
-            temp.get("inner")->getAsArray()->push_back((*this)(it));
+        if(!obj->inner.empty()){
+            temp["inner"] = llvm::json::Array{};
+            for(auto & it: obj->inner){
+                temp.get("inner")->getAsArray()->push_back((*this)(it));
+            }
         }
         return temp;
     }

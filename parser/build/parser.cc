@@ -101,6 +101,8 @@ auto wk_getline(char endline = "\n"[0]) {
 
 Obj* root;
 Mgr gMgr;
+//ScopeList scope_list;
+Scope gScope;//常量传播用的单个全局作用域
 
 auto yylex() {
   auto tk = wk_getline();
@@ -205,6 +207,12 @@ auto yylex() {
       llvm::SmallString<16> Buffer;
       apf.toString(Buffer);
       expr->value = Buffer.c_str();
+      
+      //常量传播
+      auto tmp = dynamic_cast<Expr*>(expr);
+      tmp->spread_able = 1;
+      tmp->val = expr->val;
+
       yylval.expr = expr;
       return T_FLOATING_LITERAL;
     }
@@ -213,14 +221,67 @@ auto yylex() {
       expr->type.basic_type = Type::my_int;
       expr->kind = "IntegerLiteral";
       if(s[0] == '0' && (s[1] == 'x' || s[1] == 'X')){
-        expr->val = std::stoi((std::string)(s), 0, 16);
+        long temp = std::stol((std::string)(s), 0, 16);
+        if(temp < 0x80000000){
+            expr->type.basic_type = Type::my_int;
+        }
+        else if(temp == 0x80000000){
+            expr->type.basic_type = Type::my_unsigned_int;
+        }
+        else {
+            expr->type.basic_type = Type::my_long;
+        }
+        expr->val = std::stol((std::string)(s), 0, 16);
+        expr->value = std::to_string(expr->val);
+      }
+      else if(s[0] == '0' && (s[1] == 'b' || s[1] == 'B')){
+        long temp = std::stol((std::string)(s), 0, 2);
+        if(temp < 0x80000000){
+            expr->type.basic_type = Type::my_int;
+        }
+        else if(temp == 0x80000000){
+            expr->type.basic_type = Type::my_unsigned_int;
+        }
+        else {
+            expr->type.basic_type = Type::my_long;
+        }
+        expr->val = std::stol((std::string)(s), 0, 2);
+        expr->value = std::to_string(expr->val);
+      }
+      else if(s[0] == '0'){
+        long temp = std::stol((std::string)(s), 0, 8);
+        if(temp < 0x80000000){
+            expr->type.basic_type = Type::my_int;
+        }
+        else if(temp == 0x80000000){
+            expr->type.basic_type = Type::my_unsigned_int;
+        }
+        else {
+            expr->type.basic_type = Type::my_long;
+        }
+        expr->val = std::stol((std::string)(s), 0, 8);
         expr->value = std::to_string(expr->val);
       }
       else{
-        expr->val = std::stoi((std::string)(s));
+        long temp = std::stol((std::string)(s));
+        if(temp < 0x80000000){
+            expr->type.basic_type = Type::my_int;
+        }
+//      else if(temp == 0x80000000){
+//        expr->type.basic_type = Type::my_unsigned_int;
+//        }
+        else {
+            expr->type.basic_type = Type::my_long;
+        }
+        expr->val = std::stol((std::string)(s));
         expr->value = std::to_string(expr->val);
       }
-      expr->type.basic_type = Type::my_int;
+
+      //常量传播
+      auto tmp = dynamic_cast<Expr*>(expr);
+      tmp->spread_able = 1;
+      tmp->val = expr->val;
+
       yylval.expr = expr;
       return T_INTEGER_LITERAL;
     }
@@ -232,7 +293,20 @@ auto yylex() {
     expr->value = s;
     expr->type.basic_type = Type::my_char;
     expr->type.is_array = 1;
-    expr->type.dim.push_back(s.size());
+    expr->type.is_lval = 1;
+    
+    int count = 0;
+    for (int i = 0; i < s.size(); i++) {
+        char c = s[i];
+        if (c == '\\') {  // 如果当前字符是反斜杠，那么跳过下一个字符
+            ++count;
+            i++;
+            continue;
+        }
+        ++count;
+    }
+
+    expr->type.dim.push_back(count-1);
     yylval.expr = expr;
     return T_STRING_LITERAL;
   }
@@ -257,7 +331,7 @@ auto yylex() {
 
 
 
-#line 261 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 335 "/workspace/SYsU-lang/parser/build/parser.cc"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -354,12 +428,12 @@ enum yysymbol_kind_t
   YYSYMBOL_primaryexpr = 66,               /* primaryexpr  */
   YYSYMBOL_numexpr = 67,                   /* numexpr  */
   YYSYMBOL_literalexpr = 68,               /* literalexpr  */
-  YYSYMBOL_unaryoperator = 69,             /* unaryoperator  */
-  YYSYMBOL_binaryoperator = 70,            /* binaryoperator  */
-  YYSYMBOL_parenexpr = 71,                 /* parenexpr  */
-  YYSYMBOL_declrefexpr = 72,               /* declrefexpr  */
-  YYSYMBOL_arraysubscriptexpr = 73,        /* arraysubscriptexpr  */
-  YYSYMBOL_lvalexpr = 74,                  /* lvalexpr  */
+  YYSYMBOL_stringliteral = 69,             /* stringliteral  */
+  YYSYMBOL_unaryoperator = 70,             /* unaryoperator  */
+  YYSYMBOL_binaryoperator = 71,            /* binaryoperator  */
+  YYSYMBOL_parenexpr = 72,                 /* parenexpr  */
+  YYSYMBOL_declrefexpr = 73,               /* declrefexpr  */
+  YYSYMBOL_arraysubscriptexpr = 74,        /* arraysubscriptexpr  */
   YYSYMBOL_callexpr = 75,                  /* callexpr  */
   YYSYMBOL_bracedlistexpr = 76,            /* bracedlistexpr  */
   YYSYMBOL_primaryexprlist = 77,           /* primaryexprlist  */
@@ -698,16 +772,16 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  12
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   328
+#define YYLAST   374
 
 /* YYNTOKENS -- Number of terminals.  */
 #define YYNTOKENS  48
 /* YYNNTS -- Number of nonterminals.  */
 #define YYNNTS  44
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  107
+#define YYNRULES  109
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  171
+#define YYNSTATES  172
 
 /* YYMAXUTOK -- Last valid token kind.  */
 #define YYMAXUTOK   302
@@ -761,17 +835,17 @@ static const yytype_int8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int16 yyrline[] =
 {
-       0,   307,   307,   313,   325,   340,   347,   348,   349,   353,
-     362,   377,   383,   392,   399,   411,   412,   420,   426,   433,
-     438,   447,   448,   459,   477,   502,   506,   512,   518,   527,
-     534,   548,   556,   560,   569,   575,   580,   586,   592,   598,
-     610,   611,   615,   616,   617,   618,   619,   620,   621,   622,
-     626,   627,   628,   632,   639,   646,   657,   665,   673,   681,
-     689,   697,   705,   713,   721,   729,   737,   745,   753,   761,
-     772,   781,   790,   802,   817,   818,   822,   830,   845,   856,
-     862,   871,   880,   881,   882,   883,   884,   885,   886,   887,
-     888,   889,   890,   894,   906,   910,   919,   927,   940,   950,
-     963,   968,   977,   984,   995,  1005,  1015,  1023
+       0,   382,   382,   388,   400,   415,   422,   423,   424,   428,
+     437,   455,   461,   470,   477,   489,   490,   498,   504,   511,
+     516,   525,   526,   537,   555,   580,   584,   590,   596,   605,
+     612,   626,   634,   638,   647,   653,   658,   664,   670,   676,
+     682,   694,   695,   699,   700,   701,   702,   703,   704,   705,
+     706,   710,   711,   712,   716,   717,   730,   739,   748,   761,
+     773,   785,   797,   809,   821,   833,   845,   857,   869,   881,
+     893,   905,   917,   932,   945,   960,   967,   982,   990,  1005,
+    1010,  1021,  1027,  1036,  1045,  1046,  1047,  1048,  1049,  1050,
+    1051,  1052,  1053,  1054,  1055,  1059,  1071,  1075,  1084,  1092,
+    1105,  1116,  1129,  1134,  1143,  1150,  1161,  1171,  1181,  1189
 };
 #endif
 
@@ -802,8 +876,8 @@ static const char *const yytname[] =
   "arrayuninitdeclaratorlist", "ptruninitdeclarator", "functiondecl",
   "paramslist", "parmvardecl", "typespecifier", "typemodifier",
   "simpletypespecifier", "primaryexpr", "numexpr", "literalexpr",
-  "unaryoperator", "binaryoperator", "parenexpr", "declrefexpr",
-  "arraysubscriptexpr", "lvalexpr", "callexpr", "bracedlistexpr",
+  "stringliteral", "unaryoperator", "binaryoperator", "parenexpr",
+  "declrefexpr", "arraysubscriptexpr", "callexpr", "bracedlistexpr",
   "primaryexprlist", "condition", "stmt", "compoundstmt", "stmtseq",
   "nullstmt", "declstmt", "assignstmt", "callexprstmt", "returnstmt",
   "ifstmt", "dostmt", "whilestmt", "breakstmt", "continuestmt", YY_NULLPTR
@@ -829,12 +903,12 @@ static const yytype_int16 yytoknum[] =
 };
 #endif
 
-#define YYPACT_NINF (-113)
+#define YYPACT_NINF (-102)
 
 #define yypact_value_is_default(Yyn) \
   ((Yyn) == YYPACT_NINF)
 
-#define YYTABLE_NINF (-95)
+#define YYTABLE_NINF (-97)
 
 #define yytable_value_is_error(Yyn) \
   0
@@ -843,24 +917,24 @@ static const yytype_int16 yytoknum[] =
      STATE-NUM.  */
 static const yytype_int16 yypact[] =
 {
-       6,  -113,  -113,     9,  -113,    -8,     6,  -113,  -113,  -113,
-     -28,    82,  -113,  -113,  -113,   -25,   -27,    31,    33,    36,
-      34,  -113,  -113,  -113,  -113,  -113,  -113,  -113,  -113,  -113,
-      15,  -113,   -25,   145,    25,  -113,  -113,    27,    55,   -25,
-    -113,   145,    30,    30,    30,    30,  -113,  -113,  -113,  -113,
-    -113,  -113,   261,  -113,  -113,  -113,  -113,   -11,    44,  -113,
-    -113,    34,    45,    48,    15,  -113,    71,    76,  -113,  -113,
-    -113,   171,    30,    30,    30,    30,    30,    30,    30,    30,
-      30,    30,    30,    30,    30,    30,    30,   107,    30,  -113,
-      34,   102,  -113,  -113,  -113,   145,  -113,  -113,   261,   273,
-     284,   293,   293,    69,    69,    69,    69,    74,    74,  -113,
-    -113,  -113,   211,  -113,    56,   229,  -113,    58,   118,    58,
-      91,    92,   127,  -113,  -113,   -25,   -11,    44,   101,   106,
-     102,  -113,   108,  -113,  -113,  -113,  -113,  -113,  -113,  -113,
-    -113,  -113,  -113,  -113,  -113,  -113,  -113,    30,   118,   114,
-     118,  -113,  -113,  -113,   110,    30,  -113,  -113,  -113,   191,
-     125,    58,  -113,  -113,   247,  -113,   118,   121,  -113,  -113,
-    -113
+       1,  -102,  -102,    18,  -102,    19,     1,  -102,  -102,  -102,
+     -26,   365,  -102,  -102,  -102,   -18,   -21,    45,    47,    48,
+      31,  -102,  -102,    65,  -102,  -102,  -102,  -102,  -102,  -102,
+      -1,  -102,   -18,   180,   111,  -102,  -102,  -102,    32,    54,
+     -18,  -102,   127,    78,    78,    78,    78,  -102,  -102,  -102,
+      30,  -102,  -102,   300,  -102,  -102,  -102,  -102,  -102,    -8,
+      40,  -102,  -102,    31,   246,    16,    -1,  -102,  -102,    58,
+      62,  -102,  -102,  -102,   206,  -102,    78,    78,    78,    78,
+      78,    78,    78,    78,    78,    78,    78,    78,    78,    78,
+      78,   145,    78,  -102,    31,    84,  -102,  -102,  -102,   180,
+    -102,  -102,   300,   312,   323,   332,   332,    52,    52,    52,
+      52,    -7,    -7,  -102,  -102,  -102,   264,  -102,    50,   282,
+    -102,    41,   121,    41,    70,    85,   163,  -102,  -102,   -18,
+     300,    86,    87,    84,  -102,    90,  -102,  -102,  -102,  -102,
+    -102,  -102,  -102,  -102,  -102,  -102,  -102,  -102,  -102,  -102,
+      78,   121,    98,   121,  -102,  -102,  -102,    93,  -102,  -102,
+    -102,  -102,   226,   102,    41,  -102,  -102,  -102,   121,   100,
+    -102,  -102
 };
 
   /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -870,42 +944,42 @@ static const yytype_int8 yydefact[] =
 {
       32,    33,     9,     0,     2,     0,    32,     6,     7,     8,
        0,     0,     1,     3,     4,     0,    21,     0,    11,    13,
-      15,    34,    39,    36,    35,    37,    38,    31,    21,    22,
-      32,    10,     0,     0,     0,    16,    26,     0,    27,    29,
-      12,     0,     0,     0,     0,     0,    71,    42,    43,    52,
-      51,    14,    50,    40,    48,    47,    49,    44,    46,    45,
-      41,    17,     0,     0,    32,    30,    79,     0,    53,    54,
-      55,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,    19,
-      18,    32,    23,    24,    28,     0,    78,    70,    61,    69,
-      68,    66,    67,    62,    63,    64,    65,    56,    57,    58,
-      59,    60,     0,    76,     0,     0,    20,     0,    32,     0,
-       0,     0,     0,    96,    97,     0,    74,    75,     0,     0,
-      32,    82,     0,    92,    83,    84,    85,    91,    86,    87,
-      88,    89,    90,    80,    72,    77,    73,     0,    32,     0,
-      32,   106,   107,   100,     0,     0,    99,    95,    93,     0,
-     102,     0,   105,   101,     0,    81,    32,     0,    98,   103,
-     104
+      15,    34,    40,    36,    35,    38,    39,    31,    21,    22,
+      32,    10,     0,     0,     0,    16,    37,    26,     0,    27,
+      29,    12,     0,     0,     0,     0,     0,    74,    43,    44,
+      54,    52,    14,    51,    41,    53,    49,    48,    50,    45,
+      47,    46,    42,    17,     0,     0,    32,    30,    79,    81,
+       0,    56,    57,    58,     0,    55,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,    19,    18,    32,    23,    24,    28,     0,
+      80,    73,    64,    72,    71,    69,    70,    65,    66,    67,
+      68,    59,    60,    61,    62,    63,     0,    77,     0,     0,
+      20,     0,    32,     0,     0,     0,     0,    98,    99,     0,
+       0,    48,    46,    32,    84,     0,    94,    85,    86,    87,
+      93,    88,    89,    90,    91,    92,    82,    75,    78,    76,
+       0,    32,     0,    32,   108,   109,   102,     0,   100,   101,
+      97,    95,     0,   104,     0,   107,   103,    83,    32,     0,
+     105,   106
 };
 
   /* YYPGOTO[NTERM-NUM].  */
-static const yytype_int16 yypgoto[] =
+static const yytype_int8 yypgoto[] =
 {
-    -113,  -113,  -113,   135,  -113,  -113,    11,   117,  -113,   103,
-     -45,   140,  -113,    93,  -113,    22,  -113,  -113,   -29,   -42,
-    -113,  -113,  -113,  -113,   -71,   -70,  -113,   -67,  -113,   -81,
-    -112,   -95,    97,    26,  -113,  -113,  -113,  -113,  -113,  -113,
-    -113,  -113,  -113,  -113
+    -102,  -102,  -102,   120,  -102,  -102,    23,   107,  -102,    92,
+     -57,   115,  -102,    75,  -102,     8,  -102,  -102,   -31,   -33,
+    -102,    96,  -102,   -91,  -102,  -102,  -102,   -61,  -102,   -75,
+    -101,   -86,    83,    27,  -102,  -102,  -102,  -102,  -102,  -102,
+    -102,  -102,  -102,  -102
 };
 
   /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_uint8 yydefgoto[] =
 {
-       0,     3,     4,     5,     6,     7,   124,    17,    18,    19,
-      35,    20,     9,    37,    38,   125,    11,    27,    66,    52,
-      53,    54,    55,    56,    57,    58,   128,    59,    60,    67,
-     148,   130,   131,   132,   133,   134,   135,   136,   137,   138,
-     139,   140,   141,   142
+       0,     3,     4,     5,     6,     7,   128,    17,    18,    19,
+      35,    20,     9,    38,    39,   129,    11,    27,    69,   130,
+      54,    55,    56,    57,    58,    59,    60,    61,    62,    70,
+     151,   133,   134,   135,   136,   137,   138,   139,   140,   141,
+     142,   143,   144,   145
 };
 
   /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -913,76 +987,86 @@ static const yytype_uint8 yydefgoto[] =
      number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_int16 yytable[] =
 {
-      68,    69,    70,    71,    51,    15,   114,   150,    15,    12,
-       1,     8,    13,    30,   143,    16,    89,     8,    28,     1,
-     126,   127,    10,   149,   129,     2,    -5,    86,    10,    87,
-      98,    99,   100,   101,   102,   103,   104,   105,   106,   107,
-     108,   109,   110,   111,   112,   116,   115,   126,   127,   167,
-      31,   129,    39,   160,    32,   162,   -25,    36,    33,   126,
-     127,    42,    43,   129,    61,    91,    44,    92,    63,    62,
-      45,   169,    34,    46,    47,    48,    64,   126,   127,   126,
-     127,   129,    88,   129,    90,    21,    39,    22,    23,    24,
-      25,    26,    95,   154,    96,   126,   127,   145,   147,   129,
-      81,    82,    83,    84,    85,   159,     1,    83,    84,    85,
-     151,   152,   117,   164,   118,   119,   120,   121,   122,    91,
-     -94,   123,     1,   155,    41,   156,   158,   161,   117,   163,
-     118,   119,   120,   121,   122,    91,   166,   123,    42,    43,
-     170,    14,    65,    44,    41,    46,   153,    45,   113,    40,
-      46,    47,    48,    49,    50,    29,   157,    94,    42,    43,
-      93,    46,    41,    44,     0,     0,     0,    45,     0,     0,
-      46,    47,    48,    49,    50,     0,    42,    43,     0,     0,
-       0,    44,     0,     0,     0,    45,     0,     0,    46,    47,
-      48,    49,    50,    72,    73,    74,    75,    76,    77,    78,
-      79,    80,    81,    82,    83,    84,    85,     0,     0,     0,
-       0,     0,    97,    72,    73,    74,    75,    76,    77,    78,
-      79,    80,    81,    82,    83,    84,    85,     0,     0,     0,
-       0,     0,   165,    72,    73,    74,    75,    76,    77,    78,
-      79,    80,    81,    82,    83,    84,    85,     0,     0,     0,
-     144,    72,    73,    74,    75,    76,    77,    78,    79,    80,
-      81,    82,    83,    84,    85,     0,   168,     0,   146,    72,
-      73,    74,    75,    76,    77,    78,    79,    80,    81,    82,
-      83,    84,    85,    72,    73,    74,    75,    76,    77,    78,
-      79,    80,    81,    82,    83,    84,    85,    74,    75,    76,
-      77,    78,    79,    80,    81,    82,    83,    84,    85,    75,
-      76,    77,    78,    79,    80,    81,    82,    83,    84,    85,
-      77,    78,    79,    80,    81,    82,    83,    84,    85
+      53,    64,    52,     1,   131,     1,    93,    15,    10,    53,
+      71,    72,    73,    74,    10,    15,   118,    16,    12,    30,
+       2,    -5,   153,     8,   146,    28,    87,    88,    89,     8,
+      90,   131,    91,    95,   132,    96,   152,   120,    40,    13,
+     -25,    37,   131,   102,   103,   104,   105,   106,   107,   108,
+     109,   110,   111,   112,   113,   114,   115,   116,    53,   119,
+     131,   132,   131,   169,    31,   163,    53,   165,    32,    34,
+      33,    36,   132,    65,    40,    66,    50,   131,    92,    99,
+     100,   150,   170,    85,    86,    87,    88,    89,     1,   154,
+     132,   148,   132,    53,   121,   157,   122,   123,   124,   125,
+     126,    95,   -96,   127,   155,   158,   159,   132,   161,    43,
+      44,   164,   166,   168,    45,    43,    44,   162,    46,   171,
+      45,    47,    48,    49,    46,     1,    14,    47,    48,    49,
+      29,   121,    67,   122,   123,   124,   125,   126,    95,    41,
+     127,    98,    43,    44,    42,    68,    75,    45,    97,     0,
+      63,    46,    43,    44,    47,    48,    49,    45,    43,    44,
+     160,    46,    42,    45,    47,    48,    49,    46,     0,     0,
+      47,    48,    49,    50,    51,     0,    43,    44,     0,     0,
+      42,    45,   156,     0,     0,    46,   117,     0,    47,    48,
+      49,    50,    51,     0,    43,    44,     0,    42,     0,    45,
+       0,     0,     0,    46,     0,     0,    47,    48,    49,    50,
+      51,    43,    44,     0,     0,     0,    45,     0,     0,     0,
+      46,     0,     0,    47,    48,    49,    50,    51,    76,    77,
+      78,    79,    80,    81,    82,    83,    84,    85,    86,    87,
+      88,    89,     0,     0,     0,     0,     0,   101,    76,    77,
+      78,    79,    80,    81,    82,    83,    84,    85,    86,    87,
+      88,    89,     0,     0,     0,     0,     0,   167,    76,    77,
+      78,    79,    80,    81,    82,    83,    84,    85,    86,    87,
+      88,    89,     0,     0,     0,    94,    76,    77,    78,    79,
+      80,    81,    82,    83,    84,    85,    86,    87,    88,    89,
+       0,     0,     0,   147,    76,    77,    78,    79,    80,    81,
+      82,    83,    84,    85,    86,    87,    88,    89,     0,     0,
+       0,   149,    76,    77,    78,    79,    80,    81,    82,    83,
+      84,    85,    86,    87,    88,    89,    78,    79,    80,    81,
+      82,    83,    84,    85,    86,    87,    88,    89,    79,    80,
+      81,    82,    83,    84,    85,    86,    87,    88,    89,    81,
+      82,    83,    84,    85,    86,    87,    88,    89,    21,     0,
+      22,    23,    24,    25,    26
 };
 
 static const yytype_int16 yycheck[] =
 {
-      42,    43,    44,    45,    33,    33,    87,   119,    33,     0,
-       4,     0,    20,    40,    95,    43,    61,     6,    43,     4,
-      91,    91,     0,   118,    91,    19,    20,    38,     6,    40,
-      72,    73,    74,    75,    76,    77,    78,    79,    80,    81,
-      82,    83,    84,    85,    86,    90,    88,   118,   118,   161,
-      19,   118,    30,   148,    21,   150,    41,    42,    22,   130,
-     130,    31,    32,   130,    39,    17,    36,    19,    41,    44,
-      40,   166,    38,    43,    44,    45,    21,   148,   148,   150,
-     150,   148,    38,   150,    39,     3,    64,     5,     6,     7,
-       8,     9,    21,   122,    18,   166,   166,    41,    40,   166,
-      31,    32,    33,    34,    35,   147,     4,    33,    34,    35,
-      19,    19,    10,   155,    12,    13,    14,    15,    16,    17,
-      18,    19,     4,    22,    17,    19,    18,    13,    10,    19,
-      12,    13,    14,    15,    16,    17,    11,    19,    31,    32,
-      19,     6,    39,    36,    17,    43,    19,    40,    41,    32,
-      43,    44,    45,    46,    47,    15,   130,    64,    31,    32,
-      63,    43,    17,    36,    -1,    -1,    -1,    40,    -1,    -1,
+      33,    34,    33,     4,    95,     4,    63,    33,     0,    42,
+      43,    44,    45,    46,     6,    33,    91,    43,     0,    40,
+      19,    20,   123,     0,    99,    43,    33,    34,    35,     6,
+      38,   122,    40,    17,    95,    19,   122,    94,    30,    20,
+      41,    42,   133,    76,    77,    78,    79,    80,    81,    82,
+      83,    84,    85,    86,    87,    88,    89,    90,    91,    92,
+     151,   122,   153,   164,    19,   151,    99,   153,    21,    38,
+      22,     6,   133,    41,    66,    21,    46,   168,    38,    21,
+      18,    40,   168,    31,    32,    33,    34,    35,     4,    19,
+     151,    41,   153,   126,    10,   126,    12,    13,    14,    15,
+      16,    17,    18,    19,    19,    19,    19,   168,    18,    31,
+      32,    13,    19,    11,    36,    31,    32,   150,    40,    19,
+      36,    43,    44,    45,    40,     4,     6,    43,    44,    45,
+      15,    10,    40,    12,    13,    14,    15,    16,    17,    32,
+      19,    66,    31,    32,    17,    18,    50,    36,    65,    -1,
+      39,    40,    31,    32,    43,    44,    45,    36,    31,    32,
+     133,    40,    17,    36,    43,    44,    45,    40,    -1,    -1,
       43,    44,    45,    46,    47,    -1,    31,    32,    -1,    -1,
-      -1,    36,    -1,    -1,    -1,    40,    -1,    -1,    43,    44,
-      45,    46,    47,    22,    23,    24,    25,    26,    27,    28,
-      29,    30,    31,    32,    33,    34,    35,    -1,    -1,    -1,
-      -1,    -1,    41,    22,    23,    24,    25,    26,    27,    28,
-      29,    30,    31,    32,    33,    34,    35,    -1,    -1,    -1,
-      -1,    -1,    41,    22,    23,    24,    25,    26,    27,    28,
-      29,    30,    31,    32,    33,    34,    35,    -1,    -1,    -1,
-      39,    22,    23,    24,    25,    26,    27,    28,    29,    30,
-      31,    32,    33,    34,    35,    -1,    19,    -1,    39,    22,
-      23,    24,    25,    26,    27,    28,    29,    30,    31,    32,
-      33,    34,    35,    22,    23,    24,    25,    26,    27,    28,
-      29,    30,    31,    32,    33,    34,    35,    24,    25,    26,
-      27,    28,    29,    30,    31,    32,    33,    34,    35,    25,
+      17,    36,    19,    -1,    -1,    40,    41,    -1,    43,    44,
+      45,    46,    47,    -1,    31,    32,    -1,    17,    -1,    36,
+      -1,    -1,    -1,    40,    -1,    -1,    43,    44,    45,    46,
+      47,    31,    32,    -1,    -1,    -1,    36,    -1,    -1,    -1,
+      40,    -1,    -1,    43,    44,    45,    46,    47,    22,    23,
+      24,    25,    26,    27,    28,    29,    30,    31,    32,    33,
+      34,    35,    -1,    -1,    -1,    -1,    -1,    41,    22,    23,
+      24,    25,    26,    27,    28,    29,    30,    31,    32,    33,
+      34,    35,    -1,    -1,    -1,    -1,    -1,    41,    22,    23,
+      24,    25,    26,    27,    28,    29,    30,    31,    32,    33,
+      34,    35,    -1,    -1,    -1,    39,    22,    23,    24,    25,
       26,    27,    28,    29,    30,    31,    32,    33,    34,    35,
-      27,    28,    29,    30,    31,    32,    33,    34,    35
+      -1,    -1,    -1,    39,    22,    23,    24,    25,    26,    27,
+      28,    29,    30,    31,    32,    33,    34,    35,    -1,    -1,
+      -1,    39,    22,    23,    24,    25,    26,    27,    28,    29,
+      30,    31,    32,    33,    34,    35,    24,    25,    26,    27,
+      28,    29,    30,    31,    32,    33,    34,    35,    25,    26,
+      27,    28,    29,    30,    31,    32,    33,    34,    35,    27,
+      28,    29,    30,    31,    32,    33,    34,    35,     3,    -1,
+       5,     6,     7,     8,     9
 };
 
   /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
@@ -992,21 +1076,21 @@ static const yytype_int8 yystos[] =
        0,     4,    19,    49,    50,    51,    52,    53,    54,    60,
       63,    64,     0,    20,    51,    33,    43,    55,    56,    57,
       59,     3,     5,     6,     7,     8,     9,    65,    43,    59,
-      40,    19,    21,    22,    38,    58,    42,    61,    62,    63,
-      55,    17,    31,    32,    36,    40,    43,    44,    45,    46,
-      47,    66,    67,    68,    69,    70,    71,    72,    73,    75,
-      76,    39,    44,    41,    21,    57,    66,    77,    67,    67,
-      67,    67,    22,    23,    24,    25,    26,    27,    28,    29,
-      30,    31,    32,    33,    34,    35,    38,    40,    38,    58,
-      39,    17,    19,    80,    61,    21,    18,    41,    67,    67,
-      67,    67,    67,    67,    67,    67,    67,    67,    67,    67,
-      67,    67,    67,    41,    77,    67,    58,    10,    12,    13,
-      14,    15,    16,    19,    54,    63,    72,    73,    74,    75,
-      79,    80,    81,    82,    83,    84,    85,    86,    87,    88,
-      89,    90,    91,    77,    39,    41,    39,    40,    78,    79,
-      78,    19,    19,    19,    66,    22,    19,    81,    18,    67,
-      79,    13,    79,    19,    67,    41,    11,    78,    19,    79,
-      19
+      40,    19,    21,    22,    38,    58,     6,    42,    61,    62,
+      63,    55,    17,    31,    32,    36,    40,    43,    44,    45,
+      46,    47,    66,    67,    68,    69,    70,    71,    72,    73,
+      74,    75,    76,    39,    67,    41,    21,    57,    18,    66,
+      77,    67,    67,    67,    67,    69,    22,    23,    24,    25,
+      26,    27,    28,    29,    30,    31,    32,    33,    34,    35,
+      38,    40,    38,    58,    39,    17,    19,    80,    61,    21,
+      18,    41,    67,    67,    67,    67,    67,    67,    67,    67,
+      67,    67,    67,    67,    67,    67,    67,    41,    77,    67,
+      58,    10,    12,    13,    14,    15,    16,    19,    54,    63,
+      67,    71,    75,    79,    80,    81,    82,    83,    84,    85,
+      86,    87,    88,    89,    90,    91,    77,    39,    41,    39,
+      40,    78,    79,    78,    19,    19,    19,    66,    19,    19,
+      81,    18,    67,    79,    13,    79,    19,    41,    11,    78,
+      79,    19
 };
 
   /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
@@ -1016,13 +1100,13 @@ static const yytype_int8 yyr1[] =
       54,    55,    55,    56,    56,    57,    57,    58,    58,    58,
       58,    59,    59,    60,    60,    61,    61,    61,    61,    62,
       62,    63,    64,    64,    65,    65,    65,    65,    65,    65,
-      66,    66,    67,    67,    67,    67,    67,    67,    67,    67,
-      68,    68,    68,    69,    69,    69,    70,    70,    70,    70,
-      70,    70,    70,    70,    70,    70,    70,    70,    70,    70,
-      71,    72,    73,    73,    74,    74,    75,    75,    76,    77,
-      77,    78,    79,    79,    79,    79,    79,    79,    79,    79,
-      79,    79,    79,    80,    81,    81,    82,    83,    84,    85,
-      86,    86,    87,    87,    88,    89,    90,    91
+      65,    66,    66,    67,    67,    67,    67,    67,    67,    67,
+      67,    68,    68,    68,    69,    69,    70,    70,    70,    71,
+      71,    71,    71,    71,    71,    71,    71,    71,    71,    71,
+      71,    71,    71,    72,    73,    74,    74,    75,    75,    76,
+      76,    77,    77,    78,    79,    79,    79,    79,    79,    79,
+      79,    79,    79,    79,    79,    80,    81,    81,    82,    83,
+      84,    85,    86,    86,    87,    87,    88,    89,    90,    91
 };
 
   /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
@@ -1031,14 +1115,14 @@ static const yytype_int8 yyr2[] =
        0,     2,     1,     2,     2,     0,     1,     1,     1,     1,
        3,     1,     3,     1,     3,     1,     2,     2,     3,     3,
        4,     1,     2,     6,     6,     0,     1,     1,     3,     1,
-       2,     2,     0,     1,     1,     1,     1,     1,     1,     1,
+       2,     2,     0,     1,     1,     1,     1,     2,     1,     1,
        1,     1,     1,     1,     1,     1,     1,     1,     1,     1,
-       1,     1,     1,     2,     2,     2,     3,     3,     3,     3,
+       1,     1,     1,     1,     1,     2,     2,     2,     2,     3,
        3,     3,     3,     3,     3,     3,     3,     3,     3,     3,
-       3,     1,     4,     4,     1,     1,     3,     4,     3,     1,
-       3,     3,     1,     1,     1,     1,     1,     1,     1,     1,
-       1,     1,     1,     3,     0,     2,     1,     1,     4,     2,
-       2,     3,     3,     5,     5,     3,     2,     2
+       3,     3,     3,     3,     1,     4,     4,     3,     4,     2,
+       3,     1,     3,     3,     1,     1,     1,     1,     1,     1,
+       1,     1,     1,     1,     1,     3,     0,     2,     1,     1,
+       2,     2,     2,     3,     3,     5,     5,     3,     2,     2
 };
 
 
@@ -1506,15 +1590,15 @@ yyreduce:
   switch (yyn)
     {
   case 2: /* start: translationunitdecl  */
-#line 307 "/workspace/SYsU-lang/parser/build/parser.y"
+#line 382 "/workspace/SYsU-lang/parser/build/parser.y"
                       {
     root = (yyvsp[0].decl);
   }
-#line 1514 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 1598 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
   case 3: /* translationunitdecl: declarationseq T_EOF  */
-#line 313 "/workspace/SYsU-lang/parser/build/parser.y"
+#line 388 "/workspace/SYsU-lang/parser/build/parser.y"
                       {
     auto decl = gMgr.make<TranslationUnitDecl>();
     if((yyvsp[-1].decl) != nullptr){
@@ -1524,11 +1608,11 @@ yyreduce:
     }
     (yyval.decl) = decl;
   }
-#line 1528 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 1612 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
   case 4: /* declarationseq: declaration declarationseq  */
-#line 326 "/workspace/SYsU-lang/parser/build/parser.y"
+#line 401 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     auto decl = dynamic_cast<DeclarationSeq*>((yyvsp[0].decl));
 
@@ -1542,29 +1626,29 @@ yyreduce:
       (yyval.decl) = decl;
     }
   }
-#line 1546 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 1630 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
   case 5: /* declarationseq: %empty  */
-#line 340 "/workspace/SYsU-lang/parser/build/parser.y"
+#line 415 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     auto decl = gMgr.make<DeclarationSeq>();
     (yyval.decl) = decl;
   }
-#line 1555 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 1639 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
   case 9: /* emptydecl: T_SEMI  */
-#line 354 "/workspace/SYsU-lang/parser/build/parser.y"
+#line 429 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     auto decl = gMgr.make<EmptyDecl>();
     (yyval.decl) = decl;
   }
-#line 1564 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 1648 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
   case 10: /* vardeclseq: typespecifier declaratorlist T_SEMI  */
-#line 363 "/workspace/SYsU-lang/parser/build/parser.y"
+#line 438 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     auto decl = gMgr.make<VarDeclSeq>();
     auto p = dynamic_cast<DeclaratorList*>((yyvsp[-1].decl));
@@ -1573,45 +1657,48 @@ yyreduce:
       auto iter = dynamic_cast<VarDecl*>(it);
       iter->type.is_const = (yyvsp[-2].decl)->type.is_const;
       iter->type.basic_type = (yyvsp[-2].decl)->type.basic_type;
+      if(iter->type.is_const && !iter->type.is_array && !iter->type.is_ptr && !iter->inner.empty()){//检测const 常量声明
+          gScope.push_decl(iter);
+      }
     }
     (yyval.decl) = decl;
   }
-#line 1580 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 1667 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
   case 11: /* declaratorlist: declarator  */
-#line 378 "/workspace/SYsU-lang/parser/build/parser.y"
+#line 456 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     auto decl = gMgr.make<DeclaratorList>();
     decl->seq.push_back((yyvsp[0].decl));
     (yyval.decl) = decl;
   }
-#line 1590 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 1677 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
   case 12: /* declaratorlist: declarator T_COMMA declaratorlist  */
-#line 384 "/workspace/SYsU-lang/parser/build/parser.y"
+#line 462 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     auto p = dynamic_cast<DeclaratorList*>((yyvsp[0].decl));
     p->seq.push_back((yyvsp[-2].decl));
     (yyval.decl) = p;
   }
-#line 1600 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 1687 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
   case 13: /* declarator: uninitdeclarator  */
-#line 393 "/workspace/SYsU-lang/parser/build/parser.y"
+#line 471 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     auto decl = gMgr.make<VarDecl>();
     decl->type = (yyvsp[0].decl)->type;
     decl->name = (yyvsp[0].decl)->name;
     (yyval.decl) = decl;
   }
-#line 1611 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 1698 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
   case 14: /* declarator: uninitdeclarator T_EQUAL primaryexpr  */
-#line 400 "/workspace/SYsU-lang/parser/build/parser.y"
+#line 478 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     auto decl = gMgr.make<VarDecl>();
     decl->type = (yyvsp[-2].decl)->type;
@@ -1619,70 +1706,70 @@ yyreduce:
     decl->inner.push_back((yyvsp[0].expr));
     (yyval.decl) = decl;
   }
-#line 1623 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 1710 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
   case 16: /* uninitdeclarator: ptruninitdeclarator arrayuninitdeclaratorlist  */
-#line 412 "/workspace/SYsU-lang/parser/build/parser.y"
+#line 490 "/workspace/SYsU-lang/parser/build/parser.y"
                                                {
     (yyval.decl) = (yyvsp[-1].decl);
     (yyval.decl)->type.is_array = 1;
     (yyval.decl)->type.dim = (yyvsp[0].decl)->type.dim;
   }
-#line 1633 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 1720 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
   case 17: /* arrayuninitdeclaratorlist: T_LEFT_SQUARE T_RIGHT_SQUARE  */
-#line 421 "/workspace/SYsU-lang/parser/build/parser.y"
+#line 499 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     (yyval.decl) = gMgr.make<Decl>();
     (yyval.decl)->type.is_array = 1;
     (yyval.decl)->type.dim.push_back(-1);
    }
-#line 1643 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 1730 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
-  case 18: /* arrayuninitdeclaratorlist: T_LEFT_SQUARE T_INTEGER_LITERAL T_RIGHT_SQUARE  */
-#line 427 "/workspace/SYsU-lang/parser/build/parser.y"
+  case 18: /* arrayuninitdeclaratorlist: T_LEFT_SQUARE numexpr T_RIGHT_SQUARE  */
+#line 505 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     (yyval.decl) = gMgr.make<Decl>();
-    auto p = dynamic_cast<IntegerLiteral*>((yyvsp[-1].expr));
     (yyval.decl)->type.is_array = 1;
-    (yyval.decl)->type.dim.push_back(p->val);
-   }
-#line 1654 "/workspace/SYsU-lang/parser/build/parser.cc"
+    auto p = dynamic_cast<Expr*>((yyvsp[-1].expr));
+    (yyval.decl)->type.dim.push_back(static_cast<int>(p->val));
+  }
+#line 1741 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
   case 19: /* arrayuninitdeclaratorlist: T_LEFT_SQUARE T_RIGHT_SQUARE arrayuninitdeclaratorlist  */
-#line 434 "/workspace/SYsU-lang/parser/build/parser.y"
+#line 512 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     (yyval.decl) = (yyvsp[0].decl);
     (yyval.decl)->type.dim.push_back(-1);
    }
-#line 1663 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 1750 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
-  case 20: /* arrayuninitdeclaratorlist: T_LEFT_SQUARE T_INTEGER_LITERAL T_RIGHT_SQUARE arrayuninitdeclaratorlist  */
-#line 439 "/workspace/SYsU-lang/parser/build/parser.y"
+  case 20: /* arrayuninitdeclaratorlist: T_LEFT_SQUARE numexpr T_RIGHT_SQUARE arrayuninitdeclaratorlist  */
+#line 517 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     (yyval.decl) = (yyvsp[0].decl);
-    auto p = dynamic_cast<IntegerLiteral*>((yyvsp[-2].expr));
-    (yyval.decl)->type.dim.push_back(p->val);
+    auto p = dynamic_cast<Expr*>((yyvsp[-2].expr));
+    (yyval.decl)->type.dim.push_back(static_cast<int>(p->val));
   }
-#line 1673 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 1760 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
   case 22: /* ptruninitdeclarator: T_STAR ptruninitdeclarator  */
-#line 449 "/workspace/SYsU-lang/parser/build/parser.y"
+#line 527 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     (yyval.decl) = (yyvsp[0].decl);
     (yyval.decl)->type.is_ptr += 1;
   }
-#line 1682 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 1769 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
   case 23: /* functiondecl: typespecifier T_IDENTIFIER T_LEFT_PAREN paramslist T_RIGHT_PAREN T_SEMI  */
-#line 460 "/workspace/SYsU-lang/parser/build/parser.y"
+#line 538 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     auto decl = gMgr.make<FunctionDecl>();
     auto p = dynamic_cast<ParamsList*>((yyvsp[-2].decl));
@@ -1700,11 +1787,11 @@ yyreduce:
     
     (yyval.decl) = decl;
   }
-#line 1704 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 1791 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
   case 24: /* functiondecl: typespecifier T_IDENTIFIER T_LEFT_PAREN paramslist T_RIGHT_PAREN compoundstmt  */
-#line 478 "/workspace/SYsU-lang/parser/build/parser.y"
+#line 556 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     auto decl = gMgr.make<FunctionDecl>();
     auto p = dynamic_cast<ParamsList*>((yyvsp[-2].decl));
@@ -1725,61 +1812,61 @@ yyreduce:
     decl->defined = 1;
     (yyval.decl) = decl;
   }
-#line 1729 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 1816 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
   case 25: /* paramslist: %empty  */
-#line 502 "/workspace/SYsU-lang/parser/build/parser.y"
+#line 580 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     auto decl = gMgr.make<ParamsList>();
     (yyval.decl) = decl;
   }
-#line 1738 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 1825 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
   case 26: /* paramslist: T_ELLIPSIS  */
-#line 507 "/workspace/SYsU-lang/parser/build/parser.y"
+#line 585 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     auto decl = gMgr.make<ParamsList>();
     decl->ellipsis = 1;
     (yyval.decl) = decl;
   }
-#line 1748 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 1835 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
   case 27: /* paramslist: parmvardecl  */
-#line 513 "/workspace/SYsU-lang/parser/build/parser.y"
+#line 591 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     auto decl = gMgr.make<ParamsList>();
     decl->seq.push_back((yyvsp[0].decl));
     (yyval.decl) = decl;
   }
-#line 1758 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 1845 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
   case 28: /* paramslist: parmvardecl T_COMMA paramslist  */
-#line 519 "/workspace/SYsU-lang/parser/build/parser.y"
+#line 597 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     auto decl = dynamic_cast<ParamsList*>((yyvsp[0].decl));
     decl->seq.push_back((yyvsp[-2].decl));
     (yyval.decl) = decl;
   }
-#line 1768 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 1855 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
   case 29: /* parmvardecl: typespecifier  */
-#line 528 "/workspace/SYsU-lang/parser/build/parser.y"
+#line 606 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     auto decl = gMgr.make<ParmVarDecl>();
     decl->type = (yyvsp[0].decl)->type;
     decl->type.is_param = 1;
     (yyval.decl) = decl;
   }
-#line 1779 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 1866 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
   case 30: /* parmvardecl: typespecifier uninitdeclarator  */
-#line 535 "/workspace/SYsU-lang/parser/build/parser.y"
+#line 613 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     auto decl = gMgr.make<ParmVarDecl>();
     decl->type = (yyvsp[0].decl)->type;
@@ -1789,351 +1876,437 @@ yyreduce:
     decl->type.is_param = 1;
     (yyval.decl) = decl;
   }
-#line 1793 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 1880 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
   case 31: /* typespecifier: typemodifier simpletypespecifier  */
-#line 548 "/workspace/SYsU-lang/parser/build/parser.y"
+#line 626 "/workspace/SYsU-lang/parser/build/parser.y"
                                   {
     (yyval.decl)->type.is_const = (yyvsp[-1].decl)->type.is_const;
     (yyval.decl)->type.basic_type = (yyvsp[0].decl)->type.basic_type;
   }
-#line 1802 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 1889 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
   case 32: /* typemodifier: %empty  */
-#line 556 "/workspace/SYsU-lang/parser/build/parser.y"
+#line 634 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     auto decl = gMgr.make<Decl>();
     (yyval.decl) = decl;
   }
-#line 1811 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 1898 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
   case 33: /* typemodifier: T_CONST  */
-#line 561 "/workspace/SYsU-lang/parser/build/parser.y"
+#line 639 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     auto decl = gMgr.make<Decl>();
     decl->type.is_const = 1;
     (yyval.decl) = decl;
   }
-#line 1821 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 1908 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
   case 34: /* simpletypespecifier: T_VOID  */
-#line 570 "/workspace/SYsU-lang/parser/build/parser.y"
+#line 648 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     auto decl = gMgr.make<Decl>();
     (yyval.decl) = decl;
     (yyval.decl)->type.basic_type = Type::my_void;
     }
-#line 1831 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 1918 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
   case 35: /* simpletypespecifier: T_INT  */
-#line 576 "/workspace/SYsU-lang/parser/build/parser.y"
+#line 654 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     auto decl = gMgr.make<Decl>();
     (yyval.decl) = decl;
     (yyval.decl)->type.basic_type = Type::my_int;}
-#line 1840 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 1927 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
   case 36: /* simpletypespecifier: T_LONG  */
-#line 581 "/workspace/SYsU-lang/parser/build/parser.y"
+#line 659 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     auto decl = gMgr.make<Decl>();
     (yyval.decl) = decl;
     (yyval.decl)->type.basic_type = Type::my_long;
   }
-#line 1850 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 1937 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
-  case 37: /* simpletypespecifier: T_FLOAT  */
-#line 587 "/workspace/SYsU-lang/parser/build/parser.y"
+  case 37: /* simpletypespecifier: T_LONG T_LONG  */
+#line 665 "/workspace/SYsU-lang/parser/build/parser.y"
+  {
+    auto decl = gMgr.make<Decl>();
+    (yyval.decl) = decl;
+    (yyval.decl)->type.basic_type = Type::my_long_long;
+  }
+#line 1947 "/workspace/SYsU-lang/parser/build/parser.cc"
+    break;
+
+  case 38: /* simpletypespecifier: T_FLOAT  */
+#line 671 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     auto decl = gMgr.make<Decl>();
     (yyval.decl) = decl;
     (yyval.decl)->type.basic_type = Type::my_float;
   }
-#line 1860 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 1957 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
-  case 38: /* simpletypespecifier: T_DOUBLE  */
-#line 593 "/workspace/SYsU-lang/parser/build/parser.y"
+  case 39: /* simpletypespecifier: T_DOUBLE  */
+#line 677 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     auto decl = gMgr.make<Decl>();
     (yyval.decl) = decl;
     (yyval.decl)->type.basic_type = Type::my_double;
   }
-#line 1870 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 1967 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
-  case 39: /* simpletypespecifier: T_CHAR  */
-#line 599 "/workspace/SYsU-lang/parser/build/parser.y"
+  case 40: /* simpletypespecifier: T_CHAR  */
+#line 683 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     auto decl = gMgr.make<Decl>();
     (yyval.decl) = decl;
     (yyval.decl)->type.basic_type = Type::my_char;
   }
-#line 1880 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 1977 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
-  case 53: /* unaryoperator: T_PLUS numexpr  */
-#line 633 "/workspace/SYsU-lang/parser/build/parser.y"
+  case 55: /* stringliteral: T_STRING_LITERAL stringliteral  */
+#line 718 "/workspace/SYsU-lang/parser/build/parser.y"
+  {
+    auto strptr1 = dynamic_cast<StringLiteral*>((yyvsp[-1].expr));
+    auto strptr2 = dynamic_cast<StringLiteral*>((yyvsp[0].expr));
+    strptr1->value.pop_back();
+    strptr2->value.erase(strptr2->value.begin());
+    strptr2->value = strptr1->value + strptr2->value;
+    strptr2->type.dim[0] = strptr1->type.dim[0] + strptr2->type.dim[0] -1;
+    (yyval.expr) = strptr2;
+  }
+#line 1991 "/workspace/SYsU-lang/parser/build/parser.cc"
+    break;
+
+  case 56: /* unaryoperator: T_PLUS numexpr  */
+#line 731 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     auto expr = gMgr.make<UnaryOperator>();
     expr->op = UnaryOperator::kPlus;
     expr->inner.push_back((yyvsp[0].expr));
+    expr->spread_able = (yyvsp[0].expr)->spread_able;
+    expr->val = (yyvsp[0].expr)->val;
     (yyval.expr) = expr;
   }
-#line 1891 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 2004 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
-  case 54: /* unaryoperator: T_MINUS numexpr  */
-#line 640 "/workspace/SYsU-lang/parser/build/parser.y"
+  case 57: /* unaryoperator: T_MINUS numexpr  */
+#line 740 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     auto expr = gMgr.make<UnaryOperator>();
     expr->op = UnaryOperator::kMinus;
     expr->inner.push_back((yyvsp[0].expr));
+    expr->spread_able = (yyvsp[0].expr)->spread_able;
+    expr->val = - ((yyvsp[0].expr)->val);
     (yyval.expr) = expr;
   }
-#line 1902 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 2017 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
-  case 55: /* unaryoperator: T_EXCLAIM numexpr  */
-#line 647 "/workspace/SYsU-lang/parser/build/parser.y"
+  case 58: /* unaryoperator: T_EXCLAIM numexpr  */
+#line 749 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     auto expr = gMgr.make<UnaryOperator>();
     expr->op = UnaryOperator::kExclaim;
     expr->inner.push_back((yyvsp[0].expr));
+    expr->spread_able = (yyvsp[0].expr)->spread_able;
+    expr->val = !((yyvsp[0].expr)->val);
     (yyval.expr) = expr;
   }
-#line 1913 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 2030 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
-  case 56: /* binaryoperator: numexpr T_PLUS numexpr  */
-#line 658 "/workspace/SYsU-lang/parser/build/parser.y"
+  case 59: /* binaryoperator: numexpr T_PLUS numexpr  */
+#line 762 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     auto expr = gMgr.make<BinaryOperator>();
     expr->op = BinaryOperator::kPlus;
     expr->inner.push_back((yyvsp[-2].expr));
     expr->inner.push_back((yyvsp[0].expr));
+    if((yyvsp[-2].expr)->spread_able && (yyvsp[0].expr)->spread_able){
+      expr->spread_able = 1;
+      expr->val = (yyvsp[-2].expr)->val + (yyvsp[0].expr)->val;
+    }
     (yyval.expr) = expr;
   }
-#line 1925 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 2046 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
-  case 57: /* binaryoperator: numexpr T_MINUS numexpr  */
-#line 666 "/workspace/SYsU-lang/parser/build/parser.y"
+  case 60: /* binaryoperator: numexpr T_MINUS numexpr  */
+#line 774 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     auto expr = gMgr.make<BinaryOperator>();
     expr->op = BinaryOperator::kMinus;
     expr->inner.push_back((yyvsp[-2].expr));
     expr->inner.push_back((yyvsp[0].expr));
+    if((yyvsp[-2].expr)->spread_able && (yyvsp[0].expr)->spread_able){
+      expr->spread_able = 1;
+      expr->val = (yyvsp[-2].expr)->val - (yyvsp[0].expr)->val;
+    }
     (yyval.expr) = expr;
   }
-#line 1937 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 2062 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
-  case 58: /* binaryoperator: numexpr T_STAR numexpr  */
-#line 674 "/workspace/SYsU-lang/parser/build/parser.y"
+  case 61: /* binaryoperator: numexpr T_STAR numexpr  */
+#line 786 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     auto expr = gMgr.make<BinaryOperator>();
     expr->op = BinaryOperator::kMultiply;
     expr->inner.push_back((yyvsp[-2].expr));
     expr->inner.push_back((yyvsp[0].expr));
+    if((yyvsp[-2].expr)->spread_able && (yyvsp[0].expr)->spread_able){
+      expr->spread_able = 1;
+      expr->val = (yyvsp[-2].expr)->val * (yyvsp[0].expr)->val;
+    }
     (yyval.expr) = expr;
   }
-#line 1949 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 2078 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
-  case 59: /* binaryoperator: numexpr T_SLASH numexpr  */
-#line 682 "/workspace/SYsU-lang/parser/build/parser.y"
+  case 62: /* binaryoperator: numexpr T_SLASH numexpr  */
+#line 798 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     auto expr = gMgr.make<BinaryOperator>();
     expr->op = BinaryOperator::kDivide;
     expr->inner.push_back((yyvsp[-2].expr));
     expr->inner.push_back((yyvsp[0].expr));
+    if((yyvsp[-2].expr)->spread_able && (yyvsp[0].expr)->spread_able){
+      expr->spread_able = 1;
+      expr->val = (yyvsp[-2].expr)->val / (yyvsp[0].expr)->val;
+    }
     (yyval.expr) = expr;
   }
-#line 1961 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 2094 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
-  case 60: /* binaryoperator: numexpr T_PERCENT numexpr  */
-#line 690 "/workspace/SYsU-lang/parser/build/parser.y"
+  case 63: /* binaryoperator: numexpr T_PERCENT numexpr  */
+#line 810 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     auto expr = gMgr.make<BinaryOperator>();
     expr->op = BinaryOperator::kMod;
     expr->inner.push_back((yyvsp[-2].expr));
     expr->inner.push_back((yyvsp[0].expr));
+    if((yyvsp[-2].expr)->spread_able && (yyvsp[0].expr)->spread_able){
+      expr->spread_able = 1;
+      expr->val = (int)(yyvsp[-2].expr)->val % (int)(yyvsp[0].expr)->val;
+    }
     (yyval.expr) = expr;
   }
-#line 1973 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 2110 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
-  case 61: /* binaryoperator: numexpr T_EQUAL numexpr  */
-#line 698 "/workspace/SYsU-lang/parser/build/parser.y"
+  case 64: /* binaryoperator: numexpr T_EQUAL numexpr  */
+#line 822 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     auto expr = gMgr.make<BinaryOperator>();
     expr->op = BinaryOperator::kEqual;
     expr->inner.push_back((yyvsp[-2].expr));
     expr->inner.push_back((yyvsp[0].expr));
+    if((yyvsp[-2].expr)->spread_able && (yyvsp[0].expr)->spread_able){
+      expr->spread_able = 1;
+      expr->val = (yyvsp[0].expr)->val;
+    }
     (yyval.expr) = expr;
   }
-#line 1985 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 2126 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
-  case 62: /* binaryoperator: numexpr T_LESS numexpr  */
-#line 706 "/workspace/SYsU-lang/parser/build/parser.y"
+  case 65: /* binaryoperator: numexpr T_LESS numexpr  */
+#line 834 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     auto expr = gMgr.make<BinaryOperator>();
     expr->op = BinaryOperator::kLess;
     expr->inner.push_back((yyvsp[-2].expr));
     expr->inner.push_back((yyvsp[0].expr));
+    if((yyvsp[-2].expr)->spread_able && (yyvsp[0].expr)->spread_able){
+      expr->spread_able = 1;
+      expr->val = (yyvsp[-2].expr)->val < (yyvsp[0].expr)->val;
+    }
     (yyval.expr) = expr;
   }
-#line 1997 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 2142 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
-  case 63: /* binaryoperator: numexpr T_GREATER numexpr  */
-#line 714 "/workspace/SYsU-lang/parser/build/parser.y"
+  case 66: /* binaryoperator: numexpr T_GREATER numexpr  */
+#line 846 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     auto expr = gMgr.make<BinaryOperator>();
     expr->op = BinaryOperator::kGreater;
     expr->inner.push_back((yyvsp[-2].expr));
     expr->inner.push_back((yyvsp[0].expr));
+    if((yyvsp[-2].expr)->spread_able && (yyvsp[0].expr)->spread_able){
+      expr->spread_able = 1;
+      expr->val = (yyvsp[-2].expr)->val > (yyvsp[0].expr)->val;
+    }
     (yyval.expr) = expr;
   }
-#line 2009 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 2158 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
-  case 64: /* binaryoperator: numexpr T_LESSEQUAL numexpr  */
-#line 722 "/workspace/SYsU-lang/parser/build/parser.y"
+  case 67: /* binaryoperator: numexpr T_LESSEQUAL numexpr  */
+#line 858 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     auto expr = gMgr.make<BinaryOperator>();
     expr->op = BinaryOperator::kLessEqual;
     expr->inner.push_back((yyvsp[-2].expr));
     expr->inner.push_back((yyvsp[0].expr));
+    if((yyvsp[-2].expr)->spread_able && (yyvsp[0].expr)->spread_able){
+      expr->spread_able = 1;
+      expr->val = (yyvsp[-2].expr)->val <= (yyvsp[0].expr)->val;
+    }
     (yyval.expr) = expr;
   }
-#line 2021 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 2174 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
-  case 65: /* binaryoperator: numexpr T_GREATEREQUAL numexpr  */
-#line 730 "/workspace/SYsU-lang/parser/build/parser.y"
+  case 68: /* binaryoperator: numexpr T_GREATEREQUAL numexpr  */
+#line 870 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     auto expr = gMgr.make<BinaryOperator>();
     expr->op = BinaryOperator::kGreaterEqual;
     expr->inner.push_back((yyvsp[-2].expr));
     expr->inner.push_back((yyvsp[0].expr));
+    if((yyvsp[-2].expr)->spread_able && (yyvsp[0].expr)->spread_able){
+      expr->spread_able = 1;
+      expr->val = (yyvsp[-2].expr)->val >= (yyvsp[0].expr)->val;
+    }
     (yyval.expr) = expr;
   }
-#line 2033 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 2190 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
-  case 66: /* binaryoperator: numexpr T_EQUALEQUAL numexpr  */
-#line 738 "/workspace/SYsU-lang/parser/build/parser.y"
+  case 69: /* binaryoperator: numexpr T_EQUALEQUAL numexpr  */
+#line 882 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     auto expr = gMgr.make<BinaryOperator>();
     expr->op = BinaryOperator::kEqualEqual;
     expr->inner.push_back((yyvsp[-2].expr));
     expr->inner.push_back((yyvsp[0].expr));
+    if((yyvsp[-2].expr)->spread_able && (yyvsp[0].expr)->spread_able){
+      expr->spread_able = 1;
+      expr->val = (yyvsp[-2].expr)->val == (yyvsp[0].expr)->val;
+    }
     (yyval.expr) = expr;
   }
-#line 2045 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 2206 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
-  case 67: /* binaryoperator: numexpr T_EXCLAIMEQUAL numexpr  */
-#line 746 "/workspace/SYsU-lang/parser/build/parser.y"
+  case 70: /* binaryoperator: numexpr T_EXCLAIMEQUAL numexpr  */
+#line 894 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     auto expr = gMgr.make<BinaryOperator>();
     expr->op = BinaryOperator::kExclaimEqual;
     expr->inner.push_back((yyvsp[-2].expr));
     expr->inner.push_back((yyvsp[0].expr));
+    if((yyvsp[-2].expr)->spread_able && (yyvsp[0].expr)->spread_able){
+      expr->spread_able = 1;
+      expr->val = (yyvsp[-2].expr)->val != (yyvsp[0].expr)->val;
+    }
     (yyval.expr) = expr;
   }
-#line 2057 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 2222 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
-  case 68: /* binaryoperator: numexpr T_AMPAMP numexpr  */
-#line 754 "/workspace/SYsU-lang/parser/build/parser.y"
+  case 71: /* binaryoperator: numexpr T_AMPAMP numexpr  */
+#line 906 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     auto expr = gMgr.make<BinaryOperator>();
     expr->op = BinaryOperator::kAmpAmp;
     expr->inner.push_back((yyvsp[-2].expr));
     expr->inner.push_back((yyvsp[0].expr));
+    if((yyvsp[-2].expr)->spread_able && (yyvsp[0].expr)->spread_able){
+      expr->spread_able = 1;
+      expr->val = (yyvsp[-2].expr)->val && (yyvsp[0].expr)->val;
+    }
     (yyval.expr) = expr;
   }
-#line 2069 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 2238 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
-  case 69: /* binaryoperator: numexpr T_PIPEPIPE numexpr  */
-#line 762 "/workspace/SYsU-lang/parser/build/parser.y"
+  case 72: /* binaryoperator: numexpr T_PIPEPIPE numexpr  */
+#line 918 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     auto expr = gMgr.make<BinaryOperator>();
     expr->op = BinaryOperator::kPipePipe;
     expr->inner.push_back((yyvsp[-2].expr));
     expr->inner.push_back((yyvsp[0].expr));
+    if((yyvsp[-2].expr)->spread_able && (yyvsp[0].expr)->spread_able){
+      expr->spread_able = 1;
+      expr->val = (yyvsp[-2].expr)->val || (yyvsp[0].expr)->val;
+    }
     (yyval.expr) = expr;
   }
-#line 2081 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 2254 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
-  case 70: /* parenexpr: T_LEFT_PAREN numexpr T_RIGHT_PAREN  */
-#line 773 "/workspace/SYsU-lang/parser/build/parser.y"
+  case 73: /* parenexpr: T_LEFT_PAREN numexpr T_RIGHT_PAREN  */
+#line 933 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     auto expr = gMgr.make<ParenExpr>();
     expr->inner.push_back((yyvsp[-1].expr));
+    if((yyvsp[-1].expr)->spread_able){
+      expr->spread_able = 1;
+      expr->val = (yyvsp[-1].expr)->val;
+    }
     (yyval.expr) = expr;
   }
-#line 2091 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 2268 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
-  case 71: /* declrefexpr: T_IDENTIFIER  */
-#line 782 "/workspace/SYsU-lang/parser/build/parser.y"
+  case 74: /* declrefexpr: T_IDENTIFIER  */
+#line 946 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     auto expr = gMgr.make<DeclRefExpr>();
     expr->name = (yyvsp[0].decl)->name;
+    VarDecl* decl = dynamic_cast<VarDecl*>(gScope.find(expr->name));
+    if(decl != nullptr){//说明是常量声明
+        auto p = dynamic_cast<Expr*>(decl->inner[0]);
+        expr->spread_able = 1;
+        expr->val = p->val;
+    }
     (yyval.expr) = expr;
   }
-#line 2101 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 2284 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
-  case 72: /* arraysubscriptexpr: declrefexpr T_LEFT_SQUARE numexpr T_RIGHT_SQUARE  */
-#line 791 "/workspace/SYsU-lang/parser/build/parser.y"
+  case 75: /* arraysubscriptexpr: declrefexpr T_LEFT_SQUARE numexpr T_RIGHT_SQUARE  */
+#line 961 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     auto expr = gMgr.make<ArraySubscriptExpr>();
-//    if(auto p = dynamic_cast<IntegerLiteral*>($3)){
-//      expr->type = $1->type;
-//      expr->type.is_array = 1;
-//      expr->type.dim.push_back(p->val);
-//    }
     expr->inner.push_back((yyvsp[-3].expr));
     expr->inner.push_back((yyvsp[-1].expr));
     (yyval.expr) = expr;
   }
-#line 2117 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 2295 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
-  case 73: /* arraysubscriptexpr: arraysubscriptexpr T_LEFT_SQUARE numexpr T_RIGHT_SQUARE  */
-#line 803 "/workspace/SYsU-lang/parser/build/parser.y"
+  case 76: /* arraysubscriptexpr: arraysubscriptexpr T_LEFT_SQUARE numexpr T_RIGHT_SQUARE  */
+#line 968 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     auto expr = gMgr.make<ArraySubscriptExpr>();
-//    if(auto p = dynamic_cast<IntegerLiteral*>($3)){
-//      expr->type = $1->type;
-//      expr->type.is_array = 1;
-//      expr->type.dim.push_back(p->val);
-//    }
     expr->inner.push_back((yyvsp[-3].expr));
     expr->inner.push_back((yyvsp[-1].expr));
     (yyval.expr) = expr;
   }
-#line 2133 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 2306 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
-  case 76: /* callexpr: declrefexpr T_LEFT_PAREN T_RIGHT_PAREN  */
-#line 823 "/workspace/SYsU-lang/parser/build/parser.y"
+  case 77: /* callexpr: declrefexpr T_LEFT_PAREN T_RIGHT_PAREN  */
+#line 983 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     auto expr = gMgr.make<CallExpr>();
     auto declrefexpr = dynamic_cast<DeclRefExpr*>((yyvsp[-2].expr));
@@ -2141,11 +2314,11 @@ yyreduce:
     expr->inner.push_back((yyvsp[-2].expr));
     (yyval.expr) = expr;
   }
-#line 2145 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 2318 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
-  case 77: /* callexpr: declrefexpr T_LEFT_PAREN primaryexprlist T_RIGHT_PAREN  */
-#line 831 "/workspace/SYsU-lang/parser/build/parser.y"
+  case 78: /* callexpr: declrefexpr T_LEFT_PAREN primaryexprlist T_RIGHT_PAREN  */
+#line 991 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     auto expr = gMgr.make<CallExpr>();
     auto declrefexpr = dynamic_cast<DeclRefExpr*>((yyvsp[-3].expr));
@@ -2157,11 +2330,20 @@ yyreduce:
     expr->name = declrefexpr->name;
     (yyval.expr) = expr;
   }
-#line 2161 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 2334 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
-  case 78: /* bracedlistexpr: T_LEFT_BRACE primaryexprlist T_RIGHT_BRACE  */
-#line 846 "/workspace/SYsU-lang/parser/build/parser.y"
+  case 79: /* bracedlistexpr: T_LEFT_BRACE T_RIGHT_BRACE  */
+#line 1006 "/workspace/SYsU-lang/parser/build/parser.y"
+  {
+    auto expr = gMgr.make<InitListExpr>();
+    (yyval.expr) = expr;
+  }
+#line 2343 "/workspace/SYsU-lang/parser/build/parser.cc"
+    break;
+
+  case 80: /* bracedlistexpr: T_LEFT_BRACE primaryexprlist T_RIGHT_BRACE  */
+#line 1011 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     auto expr = gMgr.make<InitListExpr>();
     auto p = dynamic_cast<PrimaryExprList*>((yyvsp[-1].expr));
@@ -2169,39 +2351,39 @@ yyreduce:
     expr->inner = p->seq;
     (yyval.expr) = expr;
   }
-#line 2173 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 2355 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
-  case 79: /* primaryexprlist: primaryexpr  */
-#line 857 "/workspace/SYsU-lang/parser/build/parser.y"
+  case 81: /* primaryexprlist: primaryexpr  */
+#line 1022 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     auto expr = gMgr.make<PrimaryExprList>();
     expr->seq.push_back((yyvsp[0].expr));
     (yyval.expr) = expr;
   }
-#line 2183 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 2365 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
-  case 80: /* primaryexprlist: primaryexpr T_COMMA primaryexprlist  */
-#line 863 "/workspace/SYsU-lang/parser/build/parser.y"
+  case 82: /* primaryexprlist: primaryexpr T_COMMA primaryexprlist  */
+#line 1028 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     auto expr = dynamic_cast<PrimaryExprList*>((yyvsp[0].expr));
     expr->seq.push_back((yyvsp[-2].expr));
     (yyval.expr) = expr;
   }
-#line 2193 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 2375 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
-  case 81: /* condition: T_LEFT_PAREN numexpr T_RIGHT_PAREN  */
-#line 872 "/workspace/SYsU-lang/parser/build/parser.y"
+  case 83: /* condition: T_LEFT_PAREN numexpr T_RIGHT_PAREN  */
+#line 1037 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     (yyval.expr) = (yyvsp[-1].expr);
   }
-#line 2201 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 2383 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
-  case 93: /* compoundstmt: T_LEFT_BRACE stmtseq T_RIGHT_BRACE  */
-#line 895 "/workspace/SYsU-lang/parser/build/parser.y"
+  case 95: /* compoundstmt: T_LEFT_BRACE stmtseq T_RIGHT_BRACE  */
+#line 1060 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     auto stmt = gMgr.make<CompoundStmt>();
     auto p = dynamic_cast<StmtSeq*>((yyvsp[-1].stmt));
@@ -2209,39 +2391,39 @@ yyreduce:
     stmt->inner = p->seq;
     (yyval.stmt) = stmt;
   }
-#line 2213 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 2395 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
-  case 94: /* stmtseq: %empty  */
-#line 906 "/workspace/SYsU-lang/parser/build/parser.y"
+  case 96: /* stmtseq: %empty  */
+#line 1071 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     auto stmt = gMgr.make<StmtSeq>();
     (yyval.stmt) = stmt;
   }
-#line 2222 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 2404 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
-  case 95: /* stmtseq: stmt stmtseq  */
-#line 911 "/workspace/SYsU-lang/parser/build/parser.y"
+  case 97: /* stmtseq: stmt stmtseq  */
+#line 1076 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     auto stmt = dynamic_cast<StmtSeq*>((yyvsp[0].stmt));
     stmt->seq.push_back((yyvsp[-1].stmt));
     (yyval.stmt) = stmt;
   }
-#line 2232 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 2414 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
-  case 96: /* nullstmt: T_SEMI  */
-#line 920 "/workspace/SYsU-lang/parser/build/parser.y"
+  case 98: /* nullstmt: T_SEMI  */
+#line 1085 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     auto stmt = gMgr.make<NullStmt>();
     (yyval.stmt) = stmt;
   }
-#line 2241 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 2423 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
-  case 97: /* declstmt: vardeclseq  */
-#line 928 "/workspace/SYsU-lang/parser/build/parser.y"
+  case 99: /* declstmt: vardeclseq  */
+#line 1093 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     auto stmt = gMgr.make<DeclStmt>();
     if(auto q = dynamic_cast<VarDeclSeq*>((yyvsp[0].decl))){
@@ -2251,22 +2433,23 @@ yyreduce:
       (yyval.stmt) = stmt;
     }
   }
-#line 2255 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 2437 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
-  case 98: /* assignstmt: lvalexpr T_EQUAL numexpr T_SEMI  */
-#line 941 "/workspace/SYsU-lang/parser/build/parser.y"
+  case 100: /* assignstmt: binaryoperator T_SEMI  */
+#line 1106 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     auto stmt = gMgr.make<AssignStmt>();
-    stmt->inner.push_back((yyvsp[-3].expr));
-    stmt->inner.push_back((yyvsp[-1].expr));
+    auto expr = dynamic_cast<BinaryOperator*>((yyvsp[-1].expr));
+    stmt->inner = expr->inner;
+    stmt->op = static_cast<AssignStmt::opType>(expr->op);
     (yyval.stmt) = stmt;
   }
-#line 2266 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 2449 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
-  case 99: /* callexprstmt: callexpr T_SEMI  */
-#line 951 "/workspace/SYsU-lang/parser/build/parser.y"
+  case 101: /* callexprstmt: callexpr T_SEMI  */
+#line 1117 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     auto stmt = gMgr.make<CallExprStmt>();
     auto obj = dynamic_cast<CallExpr*>((yyvsp[-1].expr));
@@ -2276,41 +2459,41 @@ yyreduce:
     stmt->decl = obj->decl;
     (yyval.stmt) = stmt;
   }
-#line 2280 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 2463 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
-  case 100: /* returnstmt: T_RETURN T_SEMI  */
-#line 964 "/workspace/SYsU-lang/parser/build/parser.y"
+  case 102: /* returnstmt: T_RETURN T_SEMI  */
+#line 1130 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     auto stmt = gMgr.make<ReturnStmt>();
     (yyval.stmt) = stmt;
   }
-#line 2289 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 2472 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
-  case 101: /* returnstmt: T_RETURN primaryexpr T_SEMI  */
-#line 969 "/workspace/SYsU-lang/parser/build/parser.y"
+  case 103: /* returnstmt: T_RETURN primaryexpr T_SEMI  */
+#line 1135 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     auto stmt = gMgr.make<ReturnStmt>();
     stmt->inner.push_back((yyvsp[-1].expr));
     (yyval.stmt) = stmt;
   }
-#line 2299 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 2482 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
-  case 102: /* ifstmt: T_IF condition stmt  */
-#line 978 "/workspace/SYsU-lang/parser/build/parser.y"
+  case 104: /* ifstmt: T_IF condition stmt  */
+#line 1144 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     auto stmt = gMgr.make<IfStmt>();
     stmt->inner.push_back((yyvsp[-1].expr));
     stmt->inner.push_back((yyvsp[0].stmt));
     (yyval.stmt) = stmt;
   }
-#line 2310 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 2493 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
-  case 103: /* ifstmt: T_IF condition stmt T_ELSE stmt  */
-#line 985 "/workspace/SYsU-lang/parser/build/parser.y"
+  case 105: /* ifstmt: T_IF condition stmt T_ELSE stmt  */
+#line 1151 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     auto stmt = gMgr.make<IfStmt>();
     stmt->inner.push_back((yyvsp[-3].expr));
@@ -2318,51 +2501,51 @@ yyreduce:
     stmt->inner.push_back((yyvsp[0].stmt));
     (yyval.stmt) = stmt;
   }
-#line 2322 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 2505 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
-  case 104: /* dostmt: T_DO stmt T_WHILE condition T_SEMI  */
-#line 996 "/workspace/SYsU-lang/parser/build/parser.y"
+  case 106: /* dostmt: T_DO stmt T_WHILE condition T_SEMI  */
+#line 1162 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     auto stmt = gMgr.make<DoStmt>();
     stmt->inner.push_back((yyvsp[-3].stmt));
     stmt->inner.push_back((yyvsp[-1].expr));
     (yyval.stmt) = stmt;
   }
-#line 2333 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 2516 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
-  case 105: /* whilestmt: T_WHILE condition stmt  */
-#line 1006 "/workspace/SYsU-lang/parser/build/parser.y"
+  case 107: /* whilestmt: T_WHILE condition stmt  */
+#line 1172 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     auto stmt = gMgr.make<WhileStmt>();
     stmt->inner.push_back((yyvsp[-1].expr));
     stmt->inner.push_back((yyvsp[0].stmt));
     (yyval.stmt) = stmt;
   }
-#line 2344 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 2527 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
-  case 106: /* breakstmt: T_BREAK T_SEMI  */
-#line 1016 "/workspace/SYsU-lang/parser/build/parser.y"
+  case 108: /* breakstmt: T_BREAK T_SEMI  */
+#line 1182 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     auto stmt = gMgr.make<BreakStmt>();
     (yyval.stmt) = stmt;
   }
-#line 2353 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 2536 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
-  case 107: /* continuestmt: T_CONTINUE T_SEMI  */
-#line 1024 "/workspace/SYsU-lang/parser/build/parser.y"
+  case 109: /* continuestmt: T_CONTINUE T_SEMI  */
+#line 1190 "/workspace/SYsU-lang/parser/build/parser.y"
   {
     auto stmt = gMgr.make<ContinueStmt>();
     (yyval.stmt) = stmt;
   }
-#line 2362 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 2545 "/workspace/SYsU-lang/parser/build/parser.cc"
     break;
 
 
-#line 2366 "/workspace/SYsU-lang/parser/build/parser.cc"
+#line 2549 "/workspace/SYsU-lang/parser/build/parser.cc"
 
       default: break;
     }
@@ -2556,5 +2739,5 @@ yyreturn:
   return yyresult;
 }
 
-#line 1030 "/workspace/SYsU-lang/parser/build/parser.y"
+#line 1196 "/workspace/SYsU-lang/parser/build/parser.y"
 

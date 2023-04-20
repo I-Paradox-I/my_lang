@@ -1,9 +1,140 @@
-33c33
-<         - kind: ImplicitCastExpr
----
->         - kind: DeclRefExpr
-36,39d35
+81,129d80
 <           inner:
-<           - kind: DeclRefExpr
+<           - kind: InitListExpr
 <             type:
-<               qualType: int
+<               qualType: int [2]
+<             inner:
+<             - kind: IntegerLiteral
+<               type:
+<                 qualType: int
+<               value: '1'
+<             - kind: IntegerLiteral
+<               type:
+<                 qualType: int
+<               value: '2'
+<           - kind: InitListExpr
+<             type:
+<               qualType: int [2]
+<             inner:
+<             - kind: IntegerLiteral
+<               type:
+<                 qualType: int
+<               value: '3'
+<             - kind: IntegerLiteral
+<               type:
+<                 qualType: int
+<               value: '4'
+<           - kind: InitListExpr
+<             type:
+<               qualType: int [2]
+<             inner:
+<             - kind: IntegerLiteral
+<               type:
+<                 qualType: int
+<               value: '5'
+<             - kind: IntegerLiteral
+<               type:
+<                 qualType: int
+<               value: '6'
+<           - kind: InitListExpr
+<             type:
+<               qualType: int [2]
+<             inner:
+<             - kind: IntegerLiteral
+<               type:
+<                 qualType: int
+<               value: '7'
+<             - kind: IntegerLiteral
+<               type:
+<                 qualType: int
+<               value: '8'
+253,283d203
+<           inner:
+<           - kind: InitListExpr
+<             type:
+<               qualType: int [2]
+<             inner:
+<             - kind: IntegerLiteral
+<               type:
+<                 qualType: int
+<               value: '1'
+<             - kind: IntegerLiteral
+<               type:
+<                 qualType: int
+<               value: '2'
+<           - kind: InitListExpr
+<             type:
+<               qualType: int [2]
+<           - kind: InitListExpr
+<             type:
+<               qualType: int [2]
+<             inner:
+<             - kind: IntegerLiteral
+<               type:
+<                 qualType: int
+<               value: '5'
+<             - kind: IntegerLiteral
+<               type:
+<                 qualType: int
+<               value: '6'
+<           - kind: InitListExpr
+<             type:
+<               qualType: int [2]
+304,360d223
+<           inner:
+<           - kind: InitListExpr
+<             type:
+<               qualType: int [2][2]
+<             inner:
+<             - kind: InitListExpr
+<               type:
+<                 qualType: int [2]
+<               inner:
+<               - kind: IntegerLiteral
+<                 type:
+<                   qualType: int
+<                 value: '1'
+<               - kind: IntegerLiteral
+<                 type:
+<                   qualType: int
+<                 value: '2'
+<             - kind: InitListExpr
+<               type:
+<                 qualType: int [2]
+<               inner:
+<               - kind: IntegerLiteral
+<                 type:
+<                   qualType: int
+<                 value: '3'
+<               - kind: IntegerLiteral
+<                 type:
+<                   qualType: int
+<                 value: '4'
+<           - kind: InitListExpr
+<             type:
+<               qualType: int [2][2]
+<             inner:
+<             - kind: InitListExpr
+<               type:
+<                 qualType: int [2]
+<               inner:
+<               - kind: IntegerLiteral
+<                 type:
+<                   qualType: int
+<                 value: '5'
+<               - kind: IntegerLiteral
+<                 type:
+<                   qualType: int
+<                 value: '6'
+<             - kind: InitListExpr
+<               type:
+<                 qualType: int [2]
+<               inner:
+<               - kind: IntegerLiteral
+<                 type:
+<                   qualType: int
+<                 value: '7'
+<               - kind: IntegerLiteral
+<                 type:
+<                   qualType: int
+<                 value: '8'

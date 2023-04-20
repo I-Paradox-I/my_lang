@@ -18,7 +18,7 @@ virtual ~Obj() = default;
 
 
 struct Type  : public Obj {
-    enum type_name {my_default, my_void, my_int, my_long, my_float, my_double, my_char} basic_type = my_default;
+    enum type_name {my_default, my_void, my_int, my_unsigned_int, my_long, my_long_long, my_float, my_double, my_char} basic_type = my_default;
     bool is_const = false;
     int is_ptr = 0;
     bool is_func = false;
@@ -38,8 +38,14 @@ struct Type  : public Obj {
             case(my_int):
                 name = name + "int ";
                 break;
+            case(my_unsigned_int):
+                name = name + "unsigned int ";
+                break;
             case(my_long):
                 name = name + "long ";
+                break;
+            case(my_long_long):
+                name = name + "long long ";
                 break;
             case(my_float):
                 name = name + "float ";
@@ -129,6 +135,8 @@ std::string name;
 
 struct Expr : public Obj {
 Type type;
+double val;//在子类中的同名val将会覆盖这个val
+bool spread_able = false;//是否可以常量传播
 };
 
 struct Stmt : public Obj {
@@ -142,9 +150,12 @@ Type type;
 struct IntegerLiteral : public Expr {
     std::string kind = "IntegerLiteral";
     std::string value;
-    std::int64_t val;
+    long val;
     // IntegerLiteral(std::string value, std::int64_t val, std::string kind = "IntegerLiteral"):kind(kind), value(value), val(val) {}
-
+    // IntegerLiteral(){
+    //     this->kind = "IntegerLiteral";
+    //     this->spread_able = true;
+    // }
 };
 
 struct FloatingLiteral : public Expr {
@@ -152,6 +163,10 @@ struct FloatingLiteral : public Expr {
     std::string value;
     double val;
     // FloatingLiteral(std::string value, double val, std::string kind = "FloatingLiteral"):kind(kind), value(value), val(val) {}
+    // FloatingLiteral(){
+    //     this->kind = "FloatingLiteral";
+    //     this->spread_able = true;
+    // }
 };
 
 struct StringLiteral : public Expr {
@@ -192,18 +207,23 @@ struct ParenExpr : public Expr{
 
 struct UnaryOperator : public Expr{
     std::string kind = "UnaryOperator";
-    enum { kPlus, kMinus, kExclaim} op; 
+    enum opType{ kPlus, kMinus, kExclaim} op; 
     std::vector<Obj*> inner;
 };
 
 struct BinaryOperator : public Expr {
     std::string kind = "BinaryOperator";
-    enum { kPlus, kMinus, kMultiply, kDivide, kMod, kEqual, kLess, kGreater, kEqualEqual, kExclaimEqual, kLessEqual, kGreaterEqual, kAmpAmp, kPipePipe} op;
+    enum opType { kPlus, kMinus, kMultiply, kDivide, kMod, kEqual, kLess, kGreater, kEqualEqual, kExclaimEqual, kLessEqual, kGreaterEqual, kAmpAmp, kPipePipe} op;
     std::vector<Obj*> inner;
     Type::type_name check_type(){
         Type::type_name name0 = dynamic_cast<Expr*>(inner[0])->type.basic_type;
         Type::type_name name1 = dynamic_cast<Expr*>(inner[1])->type.basic_type;
-        if(name0 == Type::my_int && name1 == Type::my_int) return Type::my_int;
+        if(name0 == Type::my_double || name1 == Type::my_double) return Type::my_double;
+        else if(name0 == Type::my_float || name1 == Type::my_float) return Type::my_float;
+        else if(name0 == Type::my_long_long || name1 == Type::my_long_long) return Type::my_long_long;
+        else if(name0 == Type::my_long || name1 == Type::my_long) return Type::my_long;
+        else if(name0 == Type::my_unsigned_int || name1 == Type::my_unsigned_int) return Type::my_unsigned_int;
+        else if(name0 == Type::my_int && name1 == Type::my_int) return Type::my_int;
         else return Type::my_double;
     }
 };
@@ -362,11 +382,17 @@ struct DeclStmt: public Stmt {
 
 struct AssignStmt: public Stmt {
     std::string kind = "BinaryOperator";
+    enum opType{ kPlus, kMinus, kMultiply, kDivide, kMod, kEqual, kLess, kGreater, kEqualEqual, kExclaimEqual, kLessEqual, kGreaterEqual, kAmpAmp, kPipePipe} op;
     std::vector<Obj*> inner;
     Type::type_name check_type(){
         Type::type_name name0 = dynamic_cast<Expr*>(inner[0])->type.basic_type;
         Type::type_name name1 = dynamic_cast<Expr*>(inner[1])->type.basic_type;
-        if(name0 == Type::my_int && name1 == Type::my_int) return Type::my_int;
+        if(name0 == Type::my_double || name1 == Type::my_double) return Type::my_double;
+        else if(name0 == Type::my_float || name1 == Type::my_float) return Type::my_float;
+        else if(name0 == Type::my_long_long || name1 == Type::my_long_long) return Type::my_long_long;
+        else if(name0 == Type::my_long || name1 == Type::my_long) return Type::my_long;
+        else if(name0 == Type::my_unsigned_int || name1 == Type::my_unsigned_int) return Type::my_unsigned_int;
+        else if(name0 == Type::my_int && name1 == Type::my_int) return Type::my_int;
         else return Type::my_double;
     }
 };
@@ -406,6 +432,20 @@ struct ContinueStmt: public Stmt {
     std::string kind = "ContinueStmt";
 };
 
+
+class Scope: std::unordered_map<std::string, Decl*>{
+    public:
+        void push_decl(Decl* ident){
+            (*this)[ident->name] = ident;
+        }
+        Decl* find(const std::string& name){
+            auto iter = std::unordered_map<std::string, Decl*>::find(name);
+            if(iter != this->end()){
+                return iter->second;
+            }
+            return nullptr;
+        }
+};
 
 class ScopeList : std::vector<std::unordered_map<std::string, Decl*>>{
     public:

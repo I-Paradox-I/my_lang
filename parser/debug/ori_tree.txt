@@ -1,50 +1,137 @@
-TranslationUnitDecl 0xbff5c8 <<invalid sloc>> <invalid sloc>
-|-TypedefDecl 0xbffe88 <<invalid sloc>> <invalid sloc> implicit __int128_t '__int128'
-| `-BuiltinType 0xbffb60 '__int128'
-|-TypedefDecl 0xbffef8 <<invalid sloc>> <invalid sloc> implicit __uint128_t 'unsigned __int128'
-| `-BuiltinType 0xbffb80 'unsigned __int128'
-|-TypedefDecl 0xc00200 <<invalid sloc>> <invalid sloc> implicit __NSConstantString 'struct __NSConstantString_tag'
-| `-RecordType 0xbfffd0 'struct __NSConstantString_tag'
-|   `-Record 0xbfff50 '__NSConstantString_tag'
-|-TypedefDecl 0xc002a8 <<invalid sloc>> <invalid sloc> implicit __builtin_ms_va_list 'char *'
-| `-PointerType 0xc00260 'char *'
-|   `-BuiltinType 0xbff660 'char'
-|-TypedefDecl 0xc3ecf0 <<invalid sloc>> <invalid sloc> implicit __builtin_va_list 'struct __va_list_tag [1]'
-| `-ConstantArrayType 0xc00540 'struct __va_list_tag [1]' 1 
-|   `-RecordType 0xc00380 'struct __va_list_tag'
-|     `-Record 0xc00300 '__va_list_tag'
-|-FunctionDecl 0xc3eda8 </workspace/SYsU-lang/parser/debug/test.sysu.c:2:1, line:11:1> line:2:5 used ifElse 'int ()'
-| `-CompoundStmt 0xc3f1f0 <col:14, line:11:1>
-|   |-DeclStmt 0xc3ef10 <line:3:3, col:8>
-|   | `-VarDecl 0xc3eea8 <col:3, col:7> col:7 used a 'int'
-|   |-BinaryOperator 0xc3ef68 <line:4:3, col:7> 'int' '='
-|   | |-DeclRefExpr 0xc3ef28 <col:3> 'int' lvalue Var 0xc3eea8 'a' 'int'
-|   | `-IntegerLiteral 0xc3ef48 <col:7> 'int' 5
-|   |-IfStmt 0xc3f120 <line:5:3, line:9:3> has_else
-|   | |-UnaryOperator 0xc3efc0 <line:5:7, col:8> 'int' prefix '!' cannot overflow
-|   | | `-ImplicitCastExpr 0xc3efa8 <col:8> 'int' <LValueToRValue>
-|   | |   `-DeclRefExpr 0xc3ef88 <col:8> 'int' lvalue Var 0xc3eea8 'a' 'int'
-|   | |-CompoundStmt 0xc3f038 <col:11, line:7:3>
-|   | | `-BinaryOperator 0xc3f018 <line:6:5, col:9> 'int' '='
-|   | |   |-DeclRefExpr 0xc3efd8 <col:5> 'int' lvalue Var 0xc3eea8 'a' 'int'
-|   | |   `-IntegerLiteral 0xc3eff8 <col:9> 'int' 25
-|   | `-CompoundStmt 0xc3f108 <line:7:10, line:9:3>
-|   |   `-BinaryOperator 0xc3f0e8 <line:8:5, col:13> 'int' '='
-|   |     |-DeclRefExpr 0xc3f050 <col:5> 'int' lvalue Var 0xc3eea8 'a' 'int'
-|   |     `-BinaryOperator 0xc3f0c8 <col:9, col:13> 'int' '*'
-|   |       |-ImplicitCastExpr 0xc3f0b0 <col:9> 'int' <LValueToRValue>
-|   |       | `-DeclRefExpr 0xc3f070 <col:9> 'int' lvalue Var 0xc3eea8 'a' 'int'
-|   |       `-IntegerLiteral 0xc3f090 <col:13> 'int' 2
-|   `-ReturnStmt 0xc3f1e0 <line:10:3, col:14>
-|     `-ParenExpr 0xc3f1c0 <col:10, col:14> 'int'
-|       `-BinaryOperator 0xc3f1a0 <col:11, col:13> 'int' '+'
-|         |-ImplicitCastExpr 0xc3f188 <col:11> 'int' <LValueToRValue>
-|         | `-DeclRefExpr 0xc3f148 <col:11> 'int' lvalue Var 0xc3eea8 'a' 'int'
-|         `-IntegerLiteral 0xc3f168 <col:13> 'int' 2
-`-FunctionDecl 0xc3f248 <line:14:1, line:16:1> line:14:5 main 'int ()'
-  `-CompoundStmt 0xc3f3a8 <col:12, line:16:1>
-    `-ReturnStmt 0xc3f398 <line:15:3, col:19>
-      `-ParenExpr 0xc3f378 <col:10, col:19> 'int'
-        `-CallExpr 0xc3f358 <col:11, col:18> 'int'
-          `-ImplicitCastExpr 0xc3f340 <col:11> 'int (*)()' <FunctionToPointerDecay>
-            `-DeclRefExpr 0xc3f2e8 <col:11> 'int ()' Function 0xc3eda8 'ifElse' 'int ()'
+/workspace/SYsU-lang/parser/debug/test.sysu.c:9:26: warning: excess elements in scalar initializer [-Wexcess-initializers]
+    int c[4][2]={1,2,{{3,4}},{5,6},7};
+                         ^
+TranslationUnitDecl 0xde2738 <<invalid sloc>> <invalid sloc>
+|-TypedefDecl 0xde2ff8 <<invalid sloc>> <invalid sloc> implicit __int128_t '__int128'
+| `-BuiltinType 0xde2cd0 '__int128'
+|-TypedefDecl 0xde3068 <<invalid sloc>> <invalid sloc> implicit __uint128_t 'unsigned __int128'
+| `-BuiltinType 0xde2cf0 'unsigned __int128'
+|-TypedefDecl 0xde3370 <<invalid sloc>> <invalid sloc> implicit __NSConstantString 'struct __NSConstantString_tag'
+| `-RecordType 0xde3140 'struct __NSConstantString_tag'
+|   `-Record 0xde30c0 '__NSConstantString_tag'
+|-TypedefDecl 0xde3418 <<invalid sloc>> <invalid sloc> implicit __builtin_ms_va_list 'char *'
+| `-PointerType 0xde33d0 'char *'
+|   `-BuiltinType 0xde27d0 'char'
+|-TypedefDecl 0xe21da0 <<invalid sloc>> <invalid sloc> implicit __builtin_va_list 'struct __va_list_tag [1]'
+| `-ConstantArrayType 0xde36b0 'struct __va_list_tag [1]' 1 
+|   `-RecordType 0xde34f0 'struct __va_list_tag'
+|     `-Record 0xde3470 '__va_list_tag'
+`-FunctionDecl 0xe21e58 </workspace/SYsU-lang/parser/debug/test.sysu.c:1:1, line:14:1> line:1:5 main 'int ()'
+  `-CompoundStmt 0xe44580 <col:11, line:14:1>
+    |-DeclStmt 0xe220e0 <line:2:5, col:18>
+    | `-VarDecl 0xe21fe8 <col:5, col:17> col:9 A 'int [5]' cinit
+    |   `-InitListExpr 0xe22090 <col:16, col:17> 'int [5]'
+    |     `-array_filler: ImplicitValueInitExpr 0xe220d0 <<invalid sloc>> 'int'
+    |-DeclStmt 0xe22310 <line:3:5, col:23>
+    | `-VarDecl 0xe22158 <col:5, col:22> col:9 B 'int [5]' cinit
+    |   `-InitListExpr 0xe22288 <col:16, col:22> 'int [5]'
+    |     |-array_filler: ImplicitValueInitExpr 0xe22300 <<invalid sloc>> 'int'
+    |     |-IntegerLiteral 0xe221c0 <col:17> 'int' 1
+    |     |-IntegerLiteral 0xe221e0 <col:19> 'int' 2
+    |     `-IntegerLiteral 0xe22200 <col:21> 'int' 3
+    |-DeclStmt 0xe22568 <line:4:5, col:25>
+    | `-VarDecl 0xe22388 <col:5, col:24> col:9 C 'int [5]' cinit
+    |   `-InitListExpr 0xe224e0 <col:16, col:24> 'int [5]'
+    |     |-array_filler: ImplicitValueInitExpr 0xe22558 <<invalid sloc>> 'int'
+    |     |-IntegerLiteral 0xe223f0 <col:17> 'int' 1
+    |     |-IntegerLiteral 0xe22410 <col:19> 'int' 2
+    |     |-IntegerLiteral 0xe22430 <col:21> 'int' 3
+    |     `-IntegerLiteral 0xe22450 <col:23> 'int' 4
+    |-DeclStmt 0xe227c8 <line:5:5, col:27>
+    | `-VarDecl 0xe225e0 <col:5, col:26> col:9 D 'int [5]' cinit
+    |   `-InitListExpr 0xe22760 <col:16, col:26> 'int [5]'
+    |     |-IntegerLiteral 0xe22648 <col:17> 'int' 1
+    |     |-IntegerLiteral 0xe22668 <col:19> 'int' 2
+    |     |-IntegerLiteral 0xe22688 <col:21> 'int' 3
+    |     |-IntegerLiteral 0xe226a8 <col:23> 'int' 4
+    |     `-IntegerLiteral 0xe226c8 <col:25> 'int' 5
+    |-DeclStmt 0xe22cb0 <line:7:5, col:34>
+    | `-VarDecl 0xe22918 <col:5, col:33> col:9 used a 'int [4][2]' cinit
+    |   `-InitListExpr 0xe22b10 <col:17, col:33> 'int [4][2]'
+    |     |-InitListExpr 0xe22b70 <col:18, col:20> 'int [2]'
+    |     | |-IntegerLiteral 0xe22980 <col:18> 'int' 1
+    |     | `-IntegerLiteral 0xe229a0 <col:20> 'int' 2
+    |     |-InitListExpr 0xe22bc0 <col:22, col:24> 'int [2]'
+    |     | |-IntegerLiteral 0xe229c0 <col:22> 'int' 3
+    |     | `-IntegerLiteral 0xe229e0 <col:24> 'int' 4
+    |     |-InitListExpr 0xe22c10 <col:26, col:28> 'int [2]'
+    |     | |-IntegerLiteral 0xe22a00 <col:26> 'int' 5
+    |     | `-IntegerLiteral 0xe22a20 <col:28> 'int' 6
+    |     `-InitListExpr 0xe22c60 <col:30, col:32> 'int [2]'
+    |       |-IntegerLiteral 0xe22a40 <col:30> 'int' 7
+    |       `-IntegerLiteral 0xe22a60 <col:32> 'int' 8
+    |-DeclStmt 0xe43628 <line:8:5, col:54>
+    | `-VarDecl 0xe42f00 <col:5, col:53> col:9 b 'int [4][2]' cinit
+    |   `-InitListExpr 0xe43418 <col:17, col:53> 'int [4][2]'
+    |     |-InitListExpr 0xe43488 <col:18, col:34> 'int [2]'
+    |     | |-ImplicitCastExpr 0xe434d8 <col:19, col:25> 'int' <LValueToRValue>
+    |     | | `-ArraySubscriptExpr 0xe43088 <col:19, col:25> 'int' lvalue
+    |     | |   |-ImplicitCastExpr 0xe43070 <col:19, col:22> 'int *' <ArrayToPointerDecay>
+    |     | |   | `-ArraySubscriptExpr 0xe42ff8 <col:19, col:22> 'int [2]' lvalue
+    |     | |   |   |-ImplicitCastExpr 0xe42fe0 <col:19> 'int (*)[2]' <ArrayToPointerDecay>
+    |     | |   |   | `-DeclRefExpr 0xe42f68 <col:19> 'int [4][2]' lvalue Var 0xe22918 'a' 'int [4][2]'
+    |     | |   |   `-IntegerLiteral 0xe42f88 <col:21> 'int' 0
+    |     | |   `-IntegerLiteral 0xe43018 <col:24> 'int' 0
+    |     | `-ImplicitCastExpr 0xe434f0 <col:27, col:33> 'int' <LValueToRValue>
+    |     |   `-ArraySubscriptExpr 0xe43158 <col:27, col:33> 'int' lvalue
+    |     |     |-ImplicitCastExpr 0xe43140 <col:27, col:30> 'int *' <ArrayToPointerDecay>
+    |     |     | `-ArraySubscriptExpr 0xe43100 <col:27, col:30> 'int [2]' lvalue
+    |     |     |   |-ImplicitCastExpr 0xe430e8 <col:27> 'int (*)[2]' <ArrayToPointerDecay>
+    |     |     |   | `-DeclRefExpr 0xe430a8 <col:27> 'int [4][2]' lvalue Var 0xe22918 'a' 'int [4][2]'
+    |     |     |   `-IntegerLiteral 0xe430c8 <col:29> 'int' 0
+    |     |     `-IntegerLiteral 0xe43120 <col:32> 'int' 1
+    |     |-InitListExpr 0xe43518 <col:36, col:40> 'int [2]'
+    |     | |-IntegerLiteral 0xe431c8 <col:37> 'int' 3
+    |     | `-IntegerLiteral 0xe431e8 <col:39> 'int' 4
+    |     |-InitListExpr 0xe43578 <col:42, col:46> 'int [2]'
+    |     | |-IntegerLiteral 0xe43258 <col:43> 'int' 5
+    |     | `-IntegerLiteral 0xe43278 <col:45> 'int' 6
+    |     `-InitListExpr 0xe435d8 <col:48, col:52> 'int [2]'
+    |       |-IntegerLiteral 0xe432e8 <col:49> 'int' 7
+    |       `-IntegerLiteral 0xe43308 <col:51> 'int' 8
+    |-DeclStmt 0xe43bd8 <line:9:5, col:38>
+    | `-VarDecl 0xe436e8 <col:5, col:37> col:9 c 'int [4][2]' cinit
+    |   `-InitListExpr 0xe439b0 <col:17, col:37> 'int [4][2]'
+    |     |-InitListExpr 0xe43a10 <col:18, col:20> 'int [2]'
+    |     | |-IntegerLiteral 0xe43750 <col:18> 'int' 1
+    |     | `-IntegerLiteral 0xe43770 <col:20> 'int' 2
+    |     |-InitListExpr 0xe43a70 <col:22, col:28> 'int [2]'
+    |     | |-array_filler: ImplicitValueInitExpr 0xe43b10 <<invalid sloc>> 'int'
+    |     | `-InitListExpr 0xe43ac0 <col:23, col:27> 'int'
+    |     |   `-IntegerLiteral 0xe43790 <col:24> 'int' 3
+    |     |-InitListExpr 0xe43b30 <col:30, col:34> 'int [2]'
+    |     | |-IntegerLiteral 0xe43868 <col:31> 'int' 5
+    |     | `-IntegerLiteral 0xe43888 <col:33> 'int' 6
+    |     `-InitListExpr 0xe43b80 <col:36> 'int [2]'
+    |       |-array_filler: ImplicitValueInitExpr 0xe43bc8 <<invalid sloc>> 'int'
+    |       `-IntegerLiteral 0xe438f8 <col:36> 'int' 7
+    |-DeclStmt 0xe43f10 <line:10:5, col:26>
+    | `-VarDecl 0xe43c98 <col:5, col:25> col:9 d 'int [4][2]' cinit
+    |   `-InitListExpr 0xe43df0 <col:17, col:25> 'int [4][2]'
+    |     |-array_filler: ImplicitValueInitExpr 0xe43ef0 <<invalid sloc>> 'int [2]'
+    |     |-InitListExpr 0xe43e50 <col:18, col:20> 'int [2]'
+    |     | |-IntegerLiteral 0xe43d00 <col:18> 'int' 1
+    |     | `-IntegerLiteral 0xe43d20 <col:20> 'int' 2
+    |     `-InitListExpr 0xe43ea0 <col:22, col:24> 'int [2]'
+    |       |-IntegerLiteral 0xe43d40 <col:22> 'int' 3
+    |       `-IntegerLiteral 0xe43d60 <col:24> 'int' 4
+    |-DeclStmt 0xe44538 <line:12:5, col:43>
+    | `-VarDecl 0xe440a8 <col:5, col:42> col:9 sos 'int [2][2][2]' cinit
+    |   `-InitListExpr 0xe442f8 <col:24, col:42> 'int [2][2][2]'
+    |     |-InitListExpr 0xe44358 <col:25, col:33> 'int [2][2]'
+    |     | |-InitListExpr 0xe443a8 <col:26, col:28> 'int [2]'
+    |     | | |-IntegerLiteral 0xe44110 <col:26> 'int' 1
+    |     | | `-IntegerLiteral 0xe44130 <col:28> 'int' 2
+    |     | `-InitListExpr 0xe443f8 <col:30, col:32> 'int [2]'
+    |     |   |-IntegerLiteral 0xe44150 <col:30> 'int' 3
+    |     |   `-IntegerLiteral 0xe44170 <col:32> 'int' 4
+    |     `-InitListExpr 0xe44448 <col:35, col:41> 'int [2][2]'
+    |       |-InitListExpr 0xe44498 <col:35, col:37> 'int [2]'
+    |       | |-IntegerLiteral 0xe441f0 <col:35> 'int' 5
+    |       | `-IntegerLiteral 0xe44210 <col:37> 'int' 6
+    |       `-InitListExpr 0xe444e8 <col:39, col:41> 'int [2]'
+    |         |-IntegerLiteral 0xe44230 <col:39> 'int' 7
+    |         `-IntegerLiteral 0xe44250 <col:41> 'int' 8
+    `-ReturnStmt 0xe44570 <line:13:5, col:12>
+  1 warning generated.
+    `-IntegerLiteral 0xe44550 <col:12> 'int' 0

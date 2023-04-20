@@ -3,7 +3,7 @@ inner:
 - kind: FunctionDecl
   type:
     qualType: int ()
-  name: ifElse
+  name: main
   inner:
   - kind: CompoundStmt
     inner:
@@ -11,111 +11,356 @@ inner:
       inner:
       - kind: VarDecl
         type:
-          qualType: int
-        name: a
-    - kind: BinaryOperator
-      type:
-        qualType: int
-      inner:
-      - kind: DeclRefExpr
-        type:
-          qualType: int
-      - kind: IntegerLiteral
-        type:
-          qualType: int
-        value: '5'
-    - kind: IfStmt
-      inner:
-      - kind: UnaryOperator
-        type:
-          qualType: int
+          qualType: int [5]
+        name: A
         inner:
-        - kind: ImplicitCastExpr
+        - kind: InitListExpr
           type:
-            qualType: int
-          inner:
-          - kind: DeclRefExpr
-            type:
-              qualType: int
-      - kind: CompoundStmt
+            qualType: int [5]
+    - kind: DeclStmt
+      inner:
+      - kind: VarDecl
+        type:
+          qualType: int [5]
+        name: B
         inner:
-        - kind: BinaryOperator
+        - kind: InitListExpr
           type:
-            qualType: int
+            qualType: int [5]
+    - kind: DeclStmt
+      inner:
+      - kind: VarDecl
+        type:
+          qualType: int [5]
+        name: C
+        inner:
+        - kind: InitListExpr
+          type:
+            qualType: int [5]
+    - kind: DeclStmt
+      inner:
+      - kind: VarDecl
+        type:
+          qualType: int [5]
+        name: D
+        inner:
+        - kind: InitListExpr
+          type:
+            qualType: int [5]
           inner:
-          - kind: DeclRefExpr
-            type:
-              qualType: int
           - kind: IntegerLiteral
             type:
               qualType: int
-            value: '25'
-      - kind: CompoundStmt
+            value: '1'
+          - kind: IntegerLiteral
+            type:
+              qualType: int
+            value: '2'
+          - kind: IntegerLiteral
+            type:
+              qualType: int
+            value: '3'
+          - kind: IntegerLiteral
+            type:
+              qualType: int
+            value: '4'
+          - kind: IntegerLiteral
+            type:
+              qualType: int
+            value: '5'
+    - kind: DeclStmt
+      inner:
+      - kind: VarDecl
+        type:
+          qualType: int [4][2]
+        name: a
         inner:
-        - kind: BinaryOperator
+        - kind: InitListExpr
           type:
-            qualType: int
+            qualType: int [4][2]
           inner:
-          - kind: DeclRefExpr
+          - kind: InitListExpr
             type:
-              qualType: int
-          - kind: BinaryOperator
+              qualType: int [2]
+            inner:
+            - kind: IntegerLiteral
+              type:
+                qualType: int
+              value: '1'
+            - kind: IntegerLiteral
+              type:
+                qualType: int
+              value: '2'
+          - kind: InitListExpr
             type:
-              qualType: int
+              qualType: int [2]
+            inner:
+            - kind: IntegerLiteral
+              type:
+                qualType: int
+              value: '3'
+            - kind: IntegerLiteral
+              type:
+                qualType: int
+              value: '4'
+          - kind: InitListExpr
+            type:
+              qualType: int [2]
+            inner:
+            - kind: IntegerLiteral
+              type:
+                qualType: int
+              value: '5'
+            - kind: IntegerLiteral
+              type:
+                qualType: int
+              value: '6'
+          - kind: InitListExpr
+            type:
+              qualType: int [2]
+            inner:
+            - kind: IntegerLiteral
+              type:
+                qualType: int
+              value: '7'
+            - kind: IntegerLiteral
+              type:
+                qualType: int
+              value: '8'
+    - kind: DeclStmt
+      inner:
+      - kind: VarDecl
+        type:
+          qualType: int [4][2]
+        name: b
+        inner:
+        - kind: InitListExpr
+          type:
+            qualType: int [4][2]
+          inner:
+          - kind: InitListExpr
+            type:
+              qualType: int [2]
             inner:
             - kind: ImplicitCastExpr
               type:
                 qualType: int
               inner:
-              - kind: DeclRefExpr
+              - kind: ArraySubscriptExpr
                 type:
                   qualType: int
+                inner:
+                - kind: ImplicitCastExpr
+                  type:
+                    qualType: int *
+                  inner:
+                  - kind: ArraySubscriptExpr
+                    type:
+                      qualType: int [2]
+                    inner:
+                    - kind: ImplicitCastExpr
+                      type:
+                        qualType: int (*)[2]
+                      inner:
+                      - kind: DeclRefExpr
+                        type:
+                          qualType: int [4][2]
+                    - kind: IntegerLiteral
+                      type:
+                        qualType: int
+                      value: '0'
+                - kind: IntegerLiteral
+                  type:
+                    qualType: int
+                  value: '0'
+            - kind: ImplicitCastExpr
+              type:
+                qualType: int
+              inner:
+              - kind: ArraySubscriptExpr
+                type:
+                  qualType: int
+                inner:
+                - kind: ImplicitCastExpr
+                  type:
+                    qualType: int *
+                  inner:
+                  - kind: ArraySubscriptExpr
+                    type:
+                      qualType: int [2]
+                    inner:
+                    - kind: ImplicitCastExpr
+                      type:
+                        qualType: int (*)[2]
+                      inner:
+                      - kind: DeclRefExpr
+                        type:
+                          qualType: int [4][2]
+                    - kind: IntegerLiteral
+                      type:
+                        qualType: int
+                      value: '0'
+                - kind: IntegerLiteral
+                  type:
+                    qualType: int
+                  value: '1'
+          - kind: InitListExpr
+            type:
+              qualType: int [2]
+            inner:
+            - kind: IntegerLiteral
+              type:
+                qualType: int
+              value: '3'
+            - kind: IntegerLiteral
+              type:
+                qualType: int
+              value: '4'
+          - kind: InitListExpr
+            type:
+              qualType: int [2]
+            inner:
+            - kind: IntegerLiteral
+              type:
+                qualType: int
+              value: '5'
+            - kind: IntegerLiteral
+              type:
+                qualType: int
+              value: '6'
+          - kind: InitListExpr
+            type:
+              qualType: int [2]
+            inner:
+            - kind: IntegerLiteral
+              type:
+                qualType: int
+              value: '7'
+            - kind: IntegerLiteral
+              type:
+                qualType: int
+              value: '8'
+    - kind: DeclStmt
+      inner:
+      - kind: VarDecl
+        type:
+          qualType: int [4][2]
+        name: c
+        inner:
+        - kind: InitListExpr
+          type:
+            qualType: int [4][2]
+          inner:
+          - kind: InitListExpr
+            type:
+              qualType: int [2]
+            inner:
+            - kind: IntegerLiteral
+              type:
+                qualType: int
+              value: '1'
             - kind: IntegerLiteral
               type:
                 qualType: int
               value: '2'
-    - kind: ReturnStmt
-      inner:
-      - kind: ParenExpr
-        type:
-          qualType: int
-        inner:
-        - kind: BinaryOperator
-          type:
-            qualType: int
-          inner:
-          - kind: ImplicitCastExpr
+          - kind: InitListExpr
             type:
-              qualType: int
+              qualType: int [2]
+          - kind: InitListExpr
+            type:
+              qualType: int [2]
             inner:
-            - kind: DeclRefExpr
+            - kind: IntegerLiteral
               type:
                 qualType: int
-          - kind: IntegerLiteral
+              value: '5'
+            - kind: IntegerLiteral
+              type:
+                qualType: int
+              value: '6'
+          - kind: InitListExpr
             type:
-              qualType: int
-            value: '2'
-- kind: FunctionDecl
-  type:
-    qualType: int ()
-  name: main
-  inner:
-  - kind: CompoundStmt
-    inner:
+              qualType: int [2]
+    - kind: DeclStmt
+      inner:
+      - kind: VarDecl
+        type:
+          qualType: int [4][2]
+        name: d
+        inner:
+        - kind: InitListExpr
+          type:
+            qualType: int [4][2]
+    - kind: DeclStmt
+      inner:
+      - kind: VarDecl
+        type:
+          qualType: int [2][2][2]
+        name: sos
+        inner:
+        - kind: InitListExpr
+          type:
+            qualType: int [2][2][2]
+          inner:
+          - kind: InitListExpr
+            type:
+              qualType: int [2][2]
+            inner:
+            - kind: InitListExpr
+              type:
+                qualType: int [2]
+              inner:
+              - kind: IntegerLiteral
+                type:
+                  qualType: int
+                value: '1'
+              - kind: IntegerLiteral
+                type:
+                  qualType: int
+                value: '2'
+            - kind: InitListExpr
+              type:
+                qualType: int [2]
+              inner:
+              - kind: IntegerLiteral
+                type:
+                  qualType: int
+                value: '3'
+              - kind: IntegerLiteral
+                type:
+                  qualType: int
+                value: '4'
+          - kind: InitListExpr
+            type:
+              qualType: int [2][2]
+            inner:
+            - kind: InitListExpr
+              type:
+                qualType: int [2]
+              inner:
+              - kind: IntegerLiteral
+                type:
+                  qualType: int
+                value: '5'
+              - kind: IntegerLiteral
+                type:
+                  qualType: int
+                value: '6'
+            - kind: InitListExpr
+              type:
+                qualType: int [2]
+              inner:
+              - kind: IntegerLiteral
+                type:
+                  qualType: int
+                value: '7'
+              - kind: IntegerLiteral
+                type:
+                  qualType: int
+                value: '8'
     - kind: ReturnStmt
       inner:
-      - kind: ParenExpr
+      - kind: IntegerLiteral
         type:
           qualType: int
-        inner:
-        - kind: CallExpr
-          type:
-            qualType: int
-          inner:
-          - kind: ImplicitCastExpr
-            type:
-              qualType: int (*)()
-            inner:
-            - kind: DeclRefExpr
-              type:
-                qualType: int ()
+        value: '0'

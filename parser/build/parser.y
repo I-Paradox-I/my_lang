@@ -31,6 +31,8 @@ auto wk_getline(char endline = "\n"[0]) {
 
 Obj* root;
 Mgr gMgr;
+//ScopeList scope_list;
+Scope gScope;//常量传播用的单个全局作用域
 
 auto yylex() {
   auto tk = wk_getline();
@@ -135,6 +137,12 @@ auto yylex() {
       llvm::SmallString<16> Buffer;
       apf.toString(Buffer);
       expr->value = Buffer.c_str();
+      
+      //常量传播
+      auto tmp = dynamic_cast<Expr*>(expr);
+      tmp->spread_able = 1;
+      tmp->val = expr->val;
+
       yylval.expr = expr;
       return T_FLOATING_LITERAL;
     }
@@ -143,14 +151,67 @@ auto yylex() {
       expr->type.basic_type = Type::my_int;
       expr->kind = "IntegerLiteral";
       if(s[0] == '0' && (s[1] == 'x' || s[1] == 'X')){
-        expr->val = std::stoi((std::string)(s), 0, 16);
+        long temp = std::stol((std::string)(s), 0, 16);
+        if(temp < 0x80000000){
+            expr->type.basic_type = Type::my_int;
+        }
+        else if(temp == 0x80000000){
+            expr->type.basic_type = Type::my_unsigned_int;
+        }
+        else {
+            expr->type.basic_type = Type::my_long;
+        }
+        expr->val = std::stol((std::string)(s), 0, 16);
+        expr->value = std::to_string(expr->val);
+      }
+      else if(s[0] == '0' && (s[1] == 'b' || s[1] == 'B')){
+        long temp = std::stol((std::string)(s), 0, 2);
+        if(temp < 0x80000000){
+            expr->type.basic_type = Type::my_int;
+        }
+        else if(temp == 0x80000000){
+            expr->type.basic_type = Type::my_unsigned_int;
+        }
+        else {
+            expr->type.basic_type = Type::my_long;
+        }
+        expr->val = std::stol((std::string)(s), 0, 2);
+        expr->value = std::to_string(expr->val);
+      }
+      else if(s[0] == '0'){
+        long temp = std::stol((std::string)(s), 0, 8);
+        if(temp < 0x80000000){
+            expr->type.basic_type = Type::my_int;
+        }
+        else if(temp == 0x80000000){
+            expr->type.basic_type = Type::my_unsigned_int;
+        }
+        else {
+            expr->type.basic_type = Type::my_long;
+        }
+        expr->val = std::stol((std::string)(s), 0, 8);
         expr->value = std::to_string(expr->val);
       }
       else{
-        expr->val = std::stoi((std::string)(s));
+        long temp = std::stol((std::string)(s));
+        if(temp < 0x80000000){
+            expr->type.basic_type = Type::my_int;
+        }
+//      else if(temp == 0x80000000){
+//        expr->type.basic_type = Type::my_unsigned_int;
+//        }
+        else {
+            expr->type.basic_type = Type::my_long;
+        }
+        expr->val = std::stol((std::string)(s));
         expr->value = std::to_string(expr->val);
       }
-      expr->type.basic_type = Type::my_int;
+
+      //常量传播
+      auto tmp = dynamic_cast<Expr*>(expr);
+      tmp->spread_able = 1;
+      tmp->val = expr->val;
+
       yylval.expr = expr;
       return T_INTEGER_LITERAL;
     }
@@ -162,7 +223,20 @@ auto yylex() {
     expr->value = s;
     expr->type.basic_type = Type::my_char;
     expr->type.is_array = 1;
-    expr->type.dim.push_back(s.size());
+    expr->type.is_lval = 1;
+    
+    int count = 0;
+    for (int i = 0; i < s.size(); i++) {
+        char c = s[i];
+        if (c == '\\') {  // 如果当前字符是反斜杠，那么跳过下一个字符
+            ++count;
+            i++;
+            continue;
+        }
+        ++count;
+    }
+
+    expr->type.dim.push_back(count-1);
     yylval.expr = expr;
     return T_STRING_LITERAL;
   }
@@ -271,6 +345,7 @@ auto yylex() {
 
 %nterm <expr> literalexpr
 %nterm <expr> numexpr
+%nterm <expr> stringliteral
 %nterm <expr> condition
 %nterm <expr> unaryoperator
 %nterm <expr> binaryoperator
@@ -368,6 +443,9 @@ vardeclseq:
       auto iter = dynamic_cast<VarDecl*>(it);
       iter->type.is_const = $1->type.is_const;
       iter->type.basic_type = $1->type.basic_type;
+      if(iter->type.is_const && !iter->type.is_array && !iter->type.is_ptr && !iter->inner.empty()){//检测const 常量声明
+          gScope.push_decl(iter);
+      }
     }
     $$ = decl;
   }
@@ -423,23 +501,23 @@ arrayuninitdeclaratorlist:
     $$->type.is_array = 1;
     $$->type.dim.push_back(-1);
    }
-| T_LEFT_SQUARE T_INTEGER_LITERAL T_RIGHT_SQUARE 
+| T_LEFT_SQUARE numexpr T_RIGHT_SQUARE 
   {
     $$ = gMgr.make<Decl>();
-    auto p = dynamic_cast<IntegerLiteral*>($2);
     $$->type.is_array = 1;
-    $$->type.dim.push_back(p->val);
-   }
+    auto p = dynamic_cast<Expr*>($2);
+    $$->type.dim.push_back(static_cast<int>(p->val));
+  }
 | T_LEFT_SQUARE T_RIGHT_SQUARE arrayuninitdeclaratorlist
   {
     $$ = $3;
     $$->type.dim.push_back(-1);
    }
-|  T_LEFT_SQUARE T_INTEGER_LITERAL T_RIGHT_SQUARE arrayuninitdeclaratorlist
+|  T_LEFT_SQUARE numexpr T_RIGHT_SQUARE arrayuninitdeclaratorlist
   {
     $$ = $4;
-    auto p = dynamic_cast<IntegerLiteral*>($2);
-    $$->type.dim.push_back(p->val);
+    auto p = dynamic_cast<Expr*>($2);
+    $$->type.dim.push_back(static_cast<int>(p->val));
   }
 ;
 
@@ -583,6 +661,12 @@ simpletypespecifier:
     $$ = decl;
     $$->type.basic_type = Type::my_long;
   }
+| T_LONG T_LONG  
+  {
+    auto decl = gMgr.make<Decl>();
+    $$ = decl;
+    $$->type.basic_type = Type::my_long_long;
+  }
 | T_FLOAT 
   {
     auto decl = gMgr.make<Decl>();
@@ -625,7 +709,21 @@ numexpr:
 literalexpr:
   numexpr
 | T_CHAR_LITERAL
-| T_STRING_LITERAL
+| stringliteral
+;
+
+stringliteral:
+  T_STRING_LITERAL
+| T_STRING_LITERAL stringliteral
+  {
+    auto strptr1 = dynamic_cast<StringLiteral*>($1);
+    auto strptr2 = dynamic_cast<StringLiteral*>($2);
+    strptr1->value.pop_back();
+    strptr2->value.erase(strptr2->value.begin());
+    strptr2->value = strptr1->value + strptr2->value;
+    strptr2->type.dim[0] = strptr1->type.dim[0] + strptr2->type.dim[0] -1;
+    $$ = strptr2;
+  }
 ;
 
 unaryoperator:
@@ -634,6 +732,8 @@ unaryoperator:
     auto expr = gMgr.make<UnaryOperator>();
     expr->op = UnaryOperator::kPlus;
     expr->inner.push_back($2);
+    expr->spread_able = $2->spread_able;
+    expr->val = $2->val;
     $$ = expr;
   }
 | T_MINUS numexpr %prec UOP
@@ -641,6 +741,8 @@ unaryoperator:
     auto expr = gMgr.make<UnaryOperator>();
     expr->op = UnaryOperator::kMinus;
     expr->inner.push_back($2);
+    expr->spread_able = $2->spread_able;
+    expr->val = - ($2->val);
     $$ = expr;
   }
 | T_EXCLAIM numexpr %prec UOP
@@ -648,6 +750,8 @@ unaryoperator:
     auto expr = gMgr.make<UnaryOperator>();
     expr->op = UnaryOperator::kExclaim;
     expr->inner.push_back($2);
+    expr->spread_able = $2->spread_able;
+    expr->val = !($2->val);
     $$ = expr;
   }
 ;
@@ -660,6 +764,10 @@ binaryoperator:
     expr->op = BinaryOperator::kPlus;
     expr->inner.push_back($1);
     expr->inner.push_back($3);
+    if($1->spread_able && $3->spread_able){
+      expr->spread_able = 1;
+      expr->val = $1->val + $3->val;
+    }
     $$ = expr;
   }
 | numexpr T_MINUS numexpr
@@ -668,6 +776,10 @@ binaryoperator:
     expr->op = BinaryOperator::kMinus;
     expr->inner.push_back($1);
     expr->inner.push_back($3);
+    if($1->spread_able && $3->spread_able){
+      expr->spread_able = 1;
+      expr->val = $1->val - $3->val;
+    }
     $$ = expr;
   }
 | numexpr T_STAR numexpr
@@ -676,6 +788,10 @@ binaryoperator:
     expr->op = BinaryOperator::kMultiply;
     expr->inner.push_back($1);
     expr->inner.push_back($3);
+    if($1->spread_able && $3->spread_able){
+      expr->spread_able = 1;
+      expr->val = $1->val * $3->val;
+    }
     $$ = expr;
   }
 | numexpr T_SLASH numexpr
@@ -684,6 +800,10 @@ binaryoperator:
     expr->op = BinaryOperator::kDivide;
     expr->inner.push_back($1);
     expr->inner.push_back($3);
+    if($1->spread_able && $3->spread_able){
+      expr->spread_able = 1;
+      expr->val = $1->val / $3->val;
+    }
     $$ = expr;
   }
 | numexpr T_PERCENT numexpr
@@ -692,6 +812,10 @@ binaryoperator:
     expr->op = BinaryOperator::kMod;
     expr->inner.push_back($1);
     expr->inner.push_back($3);
+    if($1->spread_able && $3->spread_able){
+      expr->spread_able = 1;
+      expr->val = (int)$1->val % (int)$3->val;
+    }
     $$ = expr;
   }
 | numexpr T_EQUAL numexpr
@@ -700,6 +824,10 @@ binaryoperator:
     expr->op = BinaryOperator::kEqual;
     expr->inner.push_back($1);
     expr->inner.push_back($3);
+    if($1->spread_able && $3->spread_able){
+      expr->spread_able = 1;
+      expr->val = $3->val;
+    }
     $$ = expr;
   }
 | numexpr T_LESS numexpr
@@ -708,6 +836,10 @@ binaryoperator:
     expr->op = BinaryOperator::kLess;
     expr->inner.push_back($1);
     expr->inner.push_back($3);
+    if($1->spread_able && $3->spread_able){
+      expr->spread_able = 1;
+      expr->val = $1->val < $3->val;
+    }
     $$ = expr;
   }
 | numexpr T_GREATER numexpr
@@ -716,6 +848,10 @@ binaryoperator:
     expr->op = BinaryOperator::kGreater;
     expr->inner.push_back($1);
     expr->inner.push_back($3);
+    if($1->spread_able && $3->spread_able){
+      expr->spread_able = 1;
+      expr->val = $1->val > $3->val;
+    }
     $$ = expr;
   }
 | numexpr T_LESSEQUAL numexpr
@@ -724,6 +860,10 @@ binaryoperator:
     expr->op = BinaryOperator::kLessEqual;
     expr->inner.push_back($1);
     expr->inner.push_back($3);
+    if($1->spread_able && $3->spread_able){
+      expr->spread_able = 1;
+      expr->val = $1->val <= $3->val;
+    }
     $$ = expr;
   }
 | numexpr T_GREATEREQUAL numexpr
@@ -732,6 +872,10 @@ binaryoperator:
     expr->op = BinaryOperator::kGreaterEqual;
     expr->inner.push_back($1);
     expr->inner.push_back($3);
+    if($1->spread_able && $3->spread_able){
+      expr->spread_able = 1;
+      expr->val = $1->val >= $3->val;
+    }
     $$ = expr;
   }
 | numexpr T_EQUALEQUAL numexpr
@@ -740,6 +884,10 @@ binaryoperator:
     expr->op = BinaryOperator::kEqualEqual;
     expr->inner.push_back($1);
     expr->inner.push_back($3);
+    if($1->spread_able && $3->spread_able){
+      expr->spread_able = 1;
+      expr->val = $1->val == $3->val;
+    }
     $$ = expr;
   }
 | numexpr T_EXCLAIMEQUAL numexpr
@@ -748,6 +896,10 @@ binaryoperator:
     expr->op = BinaryOperator::kExclaimEqual;
     expr->inner.push_back($1);
     expr->inner.push_back($3);
+    if($1->spread_able && $3->spread_able){
+      expr->spread_able = 1;
+      expr->val = $1->val != $3->val;
+    }
     $$ = expr;
   }
 | numexpr T_AMPAMP numexpr
@@ -756,6 +908,10 @@ binaryoperator:
     expr->op = BinaryOperator::kAmpAmp;
     expr->inner.push_back($1);
     expr->inner.push_back($3);
+    if($1->spread_able && $3->spread_able){
+      expr->spread_able = 1;
+      expr->val = $1->val && $3->val;
+    }
     $$ = expr;
   }
 | numexpr T_PIPEPIPE numexpr
@@ -764,6 +920,10 @@ binaryoperator:
     expr->op = BinaryOperator::kPipePipe;
     expr->inner.push_back($1);
     expr->inner.push_back($3);
+    if($1->spread_able && $3->spread_able){
+      expr->spread_able = 1;
+      expr->val = $1->val || $3->val;
+    }
     $$ = expr;
   }
 ;
@@ -773,6 +933,10 @@ parenexpr:
   {
     auto expr = gMgr.make<ParenExpr>();
     expr->inner.push_back($2);
+    if($2->spread_able){
+      expr->spread_able = 1;
+      expr->val = $2->val;
+    }
     $$ = expr;
   }
 ;
@@ -782,6 +946,12 @@ declrefexpr:
   {
     auto expr = gMgr.make<DeclRefExpr>();
     expr->name = $1->name;
+    VarDecl* decl = dynamic_cast<VarDecl*>(gScope.find(expr->name));
+    if(decl != nullptr){//说明是常量声明
+        auto p = dynamic_cast<Expr*>(decl->inner[0]);
+        expr->spread_able = 1;
+        expr->val = p->val;
+    }
     $$ = expr;
   }
 ;
@@ -790,11 +960,6 @@ arraysubscriptexpr:
   declrefexpr T_LEFT_SQUARE numexpr T_RIGHT_SQUARE
   {
     auto expr = gMgr.make<ArraySubscriptExpr>();
-//    if(auto p = dynamic_cast<IntegerLiteral*>($3)){
-//      expr->type = $1->type;
-//      expr->type.is_array = 1;
-//      expr->type.dim.push_back(p->val);
-//    }
     expr->inner.push_back($1);
     expr->inner.push_back($3);
     $$ = expr;
@@ -802,11 +967,6 @@ arraysubscriptexpr:
 | arraysubscriptexpr T_LEFT_SQUARE numexpr T_RIGHT_SQUARE
   {
     auto expr = gMgr.make<ArraySubscriptExpr>();
-//    if(auto p = dynamic_cast<IntegerLiteral*>($3)){
-//      expr->type = $1->type;
-//      expr->type.is_array = 1;
-//      expr->type.dim.push_back(p->val);
-//    }
     expr->inner.push_back($1);
     expr->inner.push_back($3);
     $$ = expr;
@@ -842,7 +1002,12 @@ callexpr:
 ;
 
 bracedlistexpr:
-  T_LEFT_BRACE primaryexprlist T_RIGHT_BRACE 
+  T_LEFT_BRACE T_RIGHT_BRACE 
+  {
+    auto expr = gMgr.make<InitListExpr>();
+    $$ = expr;
+  }
+| T_LEFT_BRACE primaryexprlist T_RIGHT_BRACE 
   {
     auto expr = gMgr.make<InitListExpr>();
     auto p = dynamic_cast<PrimaryExprList*>($2);
@@ -937,11 +1102,12 @@ declstmt:
 ;
 
 assignstmt: 
-  lvalexpr T_EQUAL numexpr T_SEMI
+  binaryoperator T_SEMI
   {
     auto stmt = gMgr.make<AssignStmt>();
-    stmt->inner.push_back($1);
-    stmt->inner.push_back($3);
+    auto expr = dynamic_cast<BinaryOperator*>($1);
+    stmt->inner = expr->inner;
+    stmt->op = static_cast<AssignStmt::opType>(expr->op);
     $$ = stmt;
   }
 ;

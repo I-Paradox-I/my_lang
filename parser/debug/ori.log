@@ -1,0 +1,4 @@
+/workspace/SYsU-lang/parser/debug/test.sysu.c:9:26: warning: excess elements in scalar initializer [-Wexcess-initializers]
+    int c[4][2]={1,2,{{3,4}},{5,6},7};
+                         ^
+1 warning generated.
